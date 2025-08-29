@@ -9,10 +9,10 @@ function HomePage() {
       <div className="bg-cyan-100 text-cyan-700 py-12 shadow-md">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow">
-            Repair It
+            रिपेयर इट
           </h1>
           <p className="text-lg md:text-xl font-medium">
-            Your trusted partner for quick and reliable appliance repairs.
+            छिटो र भरपर्दो उपकरण मर्मतका लागि तपाईंको विश्वासिलो साझेदार
           </p>
         </div>
       </div>
@@ -20,19 +20,17 @@ function HomePage() {
       {/* About Section */}
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6 grid md:grid-cols-2 gap-12 items-center">
         <div>
-          <h2 className="text-3xl font-bold mb-4 text-gray-800">About Us</h2>
+          <h2 className="text-3xl font-bold mb-4 text-gray-800">हाम्रो बारेमा</h2>
           <p className="text-gray-700 mb-4 leading-relaxed">
-            At Repair It, we specialize in repairing a wide range of household
-            appliances including refrigerators, washing machines, ovens, and
-            more. With years of experience in the industry, our skilled
-            technicians are equipped to handle any repair job with precision and
-            care.
+            रिपेयर इटमा, हामी फ्रिज, वाशिङ मेसिन, ओभन लगायत विभिन्न घरायसी
+            उपकरणहरूको मर्मतमा विशेषज्ञता राख्छौं। हाम्रो अनुभवी प्राविधिक टोली
+            कुनै पनि मर्मत कामलाई ध्यानपूर्वक र गुणस्तरीय तरिकाले सम्पन्न गर्न
+            तयार छ।
           </p>
           <p className="text-gray-700 leading-relaxed">
-            We are committed to providing exceptional service and quality
-            repairs for all your household appliances. Our team of experienced
-            technicians is here to help you get your appliances back in working
-            order quickly and efficiently.
+            हामी तपाईंलाई उत्कृष्ट सेवा र भरपर्दो मर्मत सुविधा प्रदान गर्न
+            प्रतिबद्ध छौं, ताकि तपाईंका उपकरणहरू छिटो र सहज रूपमा फेरि प्रयोगमा
+            आउन सकून्।
           </p>
         </div>
         <div>
@@ -53,16 +51,16 @@ function HomePage() {
               "/videos/fridge/1.mp4", 
               "/videos/fridge/2.mp4", 
               "/videos/fridge/3.mp4"
-              ]}
+            ]}
           />
           <div>
             <h3 className="text-2xl font-bold text-gray-800 mb-3">
-              Refrigerator Repair
+              फ्रिज मर्मत सेवा
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              We provide expert refrigerator repair services to ensure your food
-              stays fresh. Whether it’s cooling issues, leaks, or strange noises,
-              our team will diagnose and fix the problem quickly.
+              हामी विशेषज्ञ फ्रिज मर्मत सेवा प्रदान गर्छौं जसले तपाईंको खानेकुरा
+              लामो समय ताजा रहोस्। चिसो नहुने, चुहावट वा अनौठो आवाज जस्ता
+              समस्या भए पनि हाम्रो टोली छिटो समाधान गर्नेछ।
             </p>
           </div>
         </div>
@@ -71,12 +69,12 @@ function HomePage() {
         <div className="grid md:grid-cols-2 gap-10 items-center">
           <div className="order-2 md:order-1">
             <h3 className="text-2xl font-bold text-gray-800 mb-3">
-              Washing Machine Repair
+              वाशिङ मेसिन मर्मत
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              From drainage problems to unusual vibrations, our washing machine
-              repair services cover all major issues. We’ll make sure your
-              laundry routine runs smoothly again.
+              निकास समस्या, अनौठो कम्पन वा अन्य समस्या भए पनि हाम्रो वाशिङ
+              मेसिन मर्मत सेवा सबै प्रमुख समस्याहरू समाधान गर्छ। हामी तपाईंको
+              कपडा धुने कार्यलाई फेरि सहज बनाउनेछौं।
             </p>
           </div>
           <VideoPlayer 
@@ -84,8 +82,8 @@ function HomePage() {
               "/videos/washing/1.mp4",
               "/videos/washing/2.mp4",
               "/videos/washing/3.mp4"
-              ]}
-            />
+            ]}
+          />
         </div>
 
         {/* AC Repair */}
@@ -94,16 +92,16 @@ function HomePage() {
             sources={[
               "/videos/AC/1.mp4", 
               "/videos/AC/2.mp4"
-              ]}
-            />
+            ]}
+          />
           <div>
             <h3 className="text-2xl font-bold text-gray-800 mb-3">
-              Air Conditioner Repair
+              एयर कन्डिसनर मर्मत
             </h3>
             <p className="text-gray-700 leading-relaxed">
-              Stay cool and comfortable with our reliable AC repair services.
-              We handle everything from gas leaks to cooling inefficiency,
-              ensuring your AC works like new.
+              हाम्रो भरपर्दो एसी मर्मत सेवाबाट तपाईं शान्त र आरामदायी रहन सक्नुहुन्छ।
+              ग्यास चुहावटदेखि चिसोपन समस्या सम्म सबै कुरा हामी ह्यान्डल गर्छौं,
+              तपाईंको एसी नयाँ जस्तै काम गर्ने सुनिश्चित गर्दै।
             </p>
           </div>
         </div>
@@ -111,23 +109,23 @@ function HomePage() {
 
       {/* Call-to-Action Section */}
       <div className="bg-gradient-to-r from-red-400 to-rose-500 py-20 text-center text-white">
-        <h2 className="text-3xl font-extrabold mb-4">Need a Repair?</h2>
+        <h2 className="text-3xl font-extrabold mb-4">मर्मत आवश्यक छ?</h2>
         <p className="text-lg md:text-xl mb-6 max-w-2xl mx-auto">
-          You can place an order for our repair services through our easy Order
-          system. Click below to get started!
+          हाम्रो सजिलो अर्डर प्रणाली मार्फत तपाईं हाम्रो मर्मत सेवाको अर्डर राख्न
+          सक्नुहुन्छ। सुरु गर्न तल क्लिक गर्नुहोस्!
         </p>
         <Link
           to="/order"
           className="bg-white text-rose-600 font-semibold py-3 px-6 rounded-xl shadow hover:bg-gray-100 transition"
         >
-          Place an Order
+          अर्डर गर्नुहोस्
         </Link>
         <p className="text-2xl font-bold mt-8">
-          Or contact us at:{" "}
+          वा हामीलाई सम्पर्क गर्नुहोस्:{" "}
           <span className="underline">+977-9800000000</span>
         </p>
         <p className="text-lg mt-3">
-          Our staff is ready to listen to your problem and solve it quickly!
+          हाम्रो टोली तपाईंको समस्या छिटो समाधान गर्न तयार छ!
         </p>
       </div>
     </div>
@@ -135,4 +133,3 @@ function HomePage() {
 }
 
 export default HomePage;
-

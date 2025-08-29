@@ -4,12 +4,12 @@ from django.conf import settings
 
 class Order(models.Model):
     STATUS_CHOICES = [
-        ("ON_GOING", "On Going"),
-        ("COMPLETED", "Completed"),
-        ("CANCELLED", "Cancelled"),
-        ("REJECTED", "Rejected")
+        ("ON_GOING", "चालु"),
+        ("COMPLETED", "पूरा भयो"),
+        ("CANCELLED", "रद्द भयो"),
+        ("REJECTED", "अस्वीकृत"),
     ]
-    
+
     customer = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -34,18 +34,24 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
-    UPLOAD_TO = 'order_images/'+str(models.DateTimeField(auto_now_add=True))+'/'.replace(" ", "_").replace(":", "-")+'/'
-    
+    APPLIANCE_CHOICES = [
+        ("refrigerator", "Fridge / फ्रिज"),
+        ("washing_machine", "Washing Machine / धुने मेशिन"),
+        ("ac", "AC / एयर कन्डिसनर"),
+        ("tv", "TV / टिभी"),
+        ("other", "Other / अन्य"),
+    ]
+
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
         related_name="items"
     )
-    order_name = models.CharField(max_length=255)
+    order_name = models.CharField(max_length=255, choices=APPLIANCE_CHOICES)
     order_details = models.TextField(blank=True, default="")
     quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    images = models.ImageField(upload_to=UPLOAD_TO, blank=True, null=True)
+    images = models.ImageField(upload_to="order_images/", blank=True, null=True)
 
     def __str__(self):
         return f"{self.quantity} x {self.order_name}"
@@ -57,4 +63,3 @@ class OrderItem(models.Model):
         order = self.order
         super().delete(*args, **kwargs)
         order.update_total_price()
-

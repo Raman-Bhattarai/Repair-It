@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environment
+venv/
+ENV/
+env/
+.venv/
+
+# Django stuff
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+db.sqlite3
+media/
+staticfiles/
+
+# If you collectstatic into /static/ (uncomment if needed)
+# static/
+
+# Environment variables
+.env
+.env.*
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Byte-compiled / distribution
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Coverage / Testing
+.coverage
+.tox/
+.pytest_cache/
+htmlcov/
+
+# Migrations (optional – keep if you want migrations tracked in git)
+# */migrations/*.py
+# !*/migrations/__init__.py

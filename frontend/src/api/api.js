@@ -66,6 +66,7 @@ export const logoutUser = () => {
   const refreshToken = localStorage.getItem("refresh_token");
   return api.post("/logout/", { refresh: refreshToken });
 };
+export const forgotPassword = (email) => api.post("/forgot-password/", { email });
 
 // Get currently logged-in user
 export const getUserProfile = () => api.get("/user/me/");

@@ -33,7 +33,8 @@ class OrderViewSet(viewsets.ModelViewSet):
                 order_name=item.get("order_name"),
                 order_details=item.get("order_details", ""),
                 quantity=item.get("quantity", 1),
-                price=item.get("price", 0.00)  # staff may update price later
+                price=item.get("price", 0.00),
+                images=item.get("images", None)
             )
 
         order.update_total_price()
@@ -47,13 +48,12 @@ class OrderViewSet(viewsets.ModelViewSet):
 
         # Customers cannot change other customers’ orders
         if not user.is_staff and order.customer != user:
-            return Response({"detail": "Not allowed."}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "अस्वीकृत"}, status=status.HTTP_403_FORBIDDEN)
 
         # Prevent customers from changing price/status directly
         if not user.is_staff:
-            if "status" in request.data or "total_price" in request.data:
-                request.data.pop("status", None)
-                request.data.pop("total_price", None)
+            request.data.pop("status", None)
+            request.data.pop("total_price", None)
 
         # Apply updates
         response = super().update(request, *args, **kwargs)
@@ -81,7 +81,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         user = request.user
 
         if not user.is_staff and order.customer != user:
-            return Response({"detail": "Not allowed."}, status=status.HTTP_403_FORBIDDEN)
+            return Response({"detail": "अस्वीकृत"}, status=status.HTTP_403_FORBIDDEN)
 
         if order.status not in ["CANCELLED", "COMPLETED"]:
             order.status = "CANCELLED"
@@ -105,4 +105,3 @@ class OrderViewSet(viewsets.ModelViewSet):
             "cancelled": cancelled,
             "total_revenue": total_revenue,
         })
-
