@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
-import { loginUser, getUserProfile } from "../api/api";
+import { loginUser } from "../api/api";
 import Input from "../components/auth/Input";
 import Button from "../components/auth/Button";
 
@@ -9,7 +9,7 @@ function LoginPage() {
   const { login } = useAuth();
   const navigate = useNavigate();
 
-  const [credentials, setCredentials] = useState({ email: "", password: "" });
+  const [credentials, setCredentials] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -22,26 +22,24 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      // 1️⃣ Get JWT tokens from backend
+      // 1️⃣ Get JWT tokens + user from backend
       const response = await loginUser(credentials);
-      const { access, refresh } = response.data;
+      const { access, refresh, user } = response.data;
 
-      // 2️⃣ Store tokens
+      // 2️⃣ Store tokens in localStorage
       localStorage.setItem("access_token", access);
       localStorage.setItem("refresh_token", refresh);
 
-      // 3️⃣ Fetch user profile
-      const profileRes = await getUserProfile();
-      const userData = profileRes.data;
+      // 3️⃣ Save user + tokens in context
+      login(user, access, refresh);
 
-      // 4️⃣ Save in context
-      login(userData, access, refresh);
-
-      // 5️⃣ Redirect
-      navigate("/menu");
+      // 4️⃣ Redirect to home page
+      navigate("/");
     } catch (err) {
-      console.error(err);
-      setError("Invalid email or password");
+      console.error("Login error:", err.response?.data || err.message);
+      setError(
+        err.response?.data?.detail || "Invalid username or password"
+      );
     } finally {
       setLoading(false);
     }
@@ -58,10 +56,9 @@ function LoginPage() {
 
         <form onSubmit={handleSubmit}>
           <Input
-            label="Email"
-            type="email"
-            name="email"
-            value={credentials.email}
+            label="Username"
+            name="username"
+            value={credentials.username}
             onChange={handleChange}
             required
           />
@@ -80,7 +77,7 @@ function LoginPage() {
         </form>
 
         <p className="text-center text-sm text-gray-600 mt-4">
-          Don&apos;t have an account?{" "}
+          Don't have an account?{" "}
           <span
             onClick={() => navigate("/register")}
             className="text-rose-600 cursor-pointer hover:underline"
@@ -94,4 +91,3 @@ function LoginPage() {
 }
 
 export default LoginPage;
-

@@ -10,7 +10,7 @@ function RegisterPage() {
   const { login } = useAuth();
 
   const [form, setForm] = useState({
-    fullname: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -37,35 +37,35 @@ function RegisterPage() {
     setLoading(true);
 
     try {
-      // 1️⃣ Prepare payload
+      // Prepare payload with optional fields only if non-empty
       const payload = {
-        fullname: form.fullname,
+        username: form.username,
         email: form.email,
         password: form.password,
       };
       if (form.phone.trim()) payload.phone = form.phone.trim();
       if (form.address.trim()) payload.address = form.address.trim();
 
-      // 2️⃣ Register user
+      // 1️⃣ Register user
       await registerUser(payload);
 
-      // 3️⃣ Auto login (email + password)
+      // 2️⃣ Auto login
       const loginRes = await loginUser({
-        email: form.email,
+        username: form.username,
         password: form.password,
       });
 
       const { access, refresh } = loginRes.data;
 
-      // 4️⃣ Store tokens
+      // 3️⃣ Store tokens in localStorage
       localStorage.setItem("access_token", access);
       localStorage.setItem("refresh_token", refresh);
 
-      // 5️⃣ Fetch profile
+      // 4️⃣ Fetch profile
       const profileRes = await getUserProfile();
       const userData = profileRes.data;
 
-      // 6️⃣ Save in context
+      // 5️⃣ Set role for Navbar
       login(
         {
           ...userData,
@@ -75,14 +75,16 @@ function RegisterPage() {
         refresh
       );
 
-      // 7️⃣ Redirect
+      // 6️⃣ Redirect to menu/home
       navigate("/menu");
     } catch (err) {
       console.error("Registration error:", err.response?.data || err);
 
+      // Extract detailed error messages from backend
       if (err.response && err.response.data) {
         const errors = err.response.data;
-        if (errors.email) setError(`Email: ${errors.email[0]}`);
+        if (errors.username) setError(`Username: ${errors.username[0]}`);
+        else if (errors.email) setError(`Email: ${errors.email[0]}`);
         else if (errors.password) setError(`Password: ${errors.password[0]}`);
         else setError("Registration failed. Try again.");
       } else {
@@ -104,9 +106,9 @@ function RegisterPage() {
 
         <form onSubmit={handleSubmit}>
           <Input
-            label="Full Name"
-            name="fullname"
-            value={form.fullname}
+            label="Username"
+            name="username"
+            value={form.username}
             onChange={handleChange}
             required
           />
@@ -135,13 +137,13 @@ function RegisterPage() {
             required
           />
           <Input
-            label="Phone"
+            label="Phone (optional)"
             name="phone"
             value={form.phone}
             onChange={handleChange}
           />
           <Input
-            label="Address"
+            label="Address (optional)"
             name="address"
             value={form.address}
             onChange={handleChange}
@@ -167,4 +169,3 @@ function RegisterPage() {
 }
 
 export default RegisterPage;
-

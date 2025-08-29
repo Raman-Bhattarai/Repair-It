@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import api from "../api/api"; // your axios instance
+import api from "../../api/api"; // your axios instance
 
 function CreateOrder({ onOrderCreated }) {
   const [items, setItems] = useState([

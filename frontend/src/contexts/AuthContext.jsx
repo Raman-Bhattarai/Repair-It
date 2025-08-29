@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { getUserProfile } from "../api/api";
+import axios from "axios";
 
 const AuthContext = createContext();
 
@@ -8,30 +9,52 @@ export const AuthProvider = ({ children }) => {
   const [accessToken, setAccessToken] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Rehydrate auth state on app load/refresh
+  // --- Rehydrate auth state on app load/refresh ---
   useEffect(() => {
     const savedAccess = localStorage.getItem("access_token");
     const savedRefresh = localStorage.getItem("refresh_token");
+    const savedUser = localStorage.getItem("user");
+
+    if (savedAccess && savedUser) {
+      setAccessToken(savedAccess);
+      setUser(JSON.parse(savedUser));
+    }
 
     if (savedAccess) {
-      setAccessToken(savedAccess);
-
-      // Fetch user profile from backend
+      // Verify or refresh token when app loads
       getUserProfile()
         .then((res) => {
-          // Ensure role exists in user object
           setUser({
             ...res.data,
-            role: res.data.role || "customer", // default to customer if role missing
+            role: res.data.role || "customer",
           });
+          localStorage.setItem("user", JSON.stringify(res.data));
         })
-        .catch(() => {
-          // If token invalid, clear all
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
-          localStorage.removeItem("user");
-          setUser(null);
-          setAccessToken(null);
+        .catch(async (err) => {
+          console.warn("Profile fetch failed:", err);
+
+          // Try refreshing access token
+          if (savedRefresh) {
+            try {
+              const refreshRes = await axios.post("/api/token/refresh/", {
+                refresh: savedRefresh,
+              });
+              const newAccess = refreshRes.data.access;
+
+              localStorage.setItem("access_token", newAccess);
+              setAccessToken(newAccess);
+
+              // retry profile fetch
+              const profileRes = await getUserProfile();
+              setUser(profileRes.data);
+              localStorage.setItem("user", JSON.stringify(profileRes.data));
+            } catch (refreshErr) {
+              console.error("Refresh failed:", refreshErr);
+              logout();
+            }
+          } else {
+            logout();
+          }
         })
         .finally(() => setLoading(false));
     } else {
@@ -40,10 +63,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = (userData, access, refresh) => {
-    setUser({
-      ...userData,
-      role: userData.role || "customer",
-    });
+    setUser({ ...userData, role: userData.role || "customer" });
     setAccessToken(access);
 
     localStorage.setItem("access_token", access);
@@ -64,7 +84,7 @@ export const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{
         user,
-        role: user?.role || null, // expose role directly for Navbar
+        role: user?.role || null,
         accessToken,
         login,
         logout,
