@@ -103,7 +103,7 @@ function Navbar() {
           <div className="flex md:hidden items-center">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="text-gray-200 hover:text-white p-2 rounded-md hover:bg-indigo-700/50 transition-all duration-200"
+              className="text-black hover:text-white p-2 rounded-md hover:bg-indigo-700/50 transition-all duration-200"
             >
               <Menu className="h-6 w-6" />
             </button>

@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import api from "../../api/api";
 
-function CreateOrder({ onClose, onOrderCreated }) {
-  const [items, setItems] = useState([
-    { order_name: "", order_details: "", quantity: 1, images: [] },
-  ]);
+function UpdateOrder({ order, onClose, onOrderUpdated }) {
+  const [items, setItems] = useState(order.items);
 
   const handleItemChange = (idx, field, value) => {
     const updated = [...items];
@@ -14,62 +12,50 @@ function CreateOrder({ onClose, onOrderCreated }) {
 
   const handleImageChange = (idx, files) => {
     const updated = [...items];
-    updated[idx].images = files;
+    updated[idx].images = Array.from(files).map((f) => ({ image: f }));
     setItems(updated);
-  };
-
-  const addItem = () => {
-    setItems([...items, { order_name: "", order_details: "", quantity: 1, images: [] }]);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const formData = new FormData();
-      formData.append("status", "PENDING");
+      const payload = {
+        status: order.status,
+        items: items.map((i) => ({
+          order_name: i.order_name,
+          order_details: i.order_details,
+          quantity: i.quantity,
+          price: i.price,
+          images: i.images.map((img) =>
+            img.image instanceof File ? { image: img.image } : { image: img.image }
+          ),
+        })),
+      };
 
-      // Convert items (without images) to JSON string
-      const itemsData = items.map((item, idx) => ({
-        order_name: item.order_name,
-        order_details: item.order_details,
-        quantity: item.quantity,
-        images: [], // DRF expects JSON field; images handled separately
-      }));
-      formData.append("items", JSON.stringify(itemsData));
-
-      // Append files separately
-      items.forEach((item, idx) => {
-        Array.from(item.images).forEach((file) => {
-          formData.append(`item_images_${idx}`, file);
-        });
+      await api.put(`orders/${order.id}/`, payload, {
+        headers: { "Content-Type": "application/json" },
       });
 
-      const res = await api.post("/orders/", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      console.log("Order created:", res.data);
-      onOrderCreated();
+      onOrderUpdated();
       onClose();
     } catch (err) {
-      console.error("Order creation failed:", err.response?.data || err.message);
+      console.error(err);
     }
   };
 
   return (
     <div className="border p-4 rounded bg-gray-50 text-black">
-      <h3 className="font-bold mb-2">नयाँ अर्डर</h3>
+      <h3 className="font-bold mb-2">अर्डर #{order.id} सम्पादन</h3>
       <form onSubmit={handleSubmit}>
         {items.map((item, idx) => (
           <div key={idx} className="mb-3 border p-2 rounded">
-            <label>उपकरण प्रकार</label>
+            <label>उपकरण</label>
             <select
               className="border p-1 w-full"
               value={item.order_name}
               onChange={(e) => handleItemChange(idx, "order_name", e.target.value)}
               required
             >
-              <option value="">छान्नुहोस्</option>
               <option value="FRIDGE">फ्रिज</option>
               <option value="WASHING_MACHINE">वाशिङ मेसिन</option>
               <option value="OVEN">अभन</option>
@@ -80,7 +66,6 @@ function CreateOrder({ onClose, onOrderCreated }) {
 
             <textarea
               className="border p-1 w-full mt-1"
-              placeholder="समस्या विवरण"
               value={item.order_details}
               onChange={(e) => handleItemChange(idx, "order_details", e.target.value)}
             />
@@ -101,11 +86,8 @@ function CreateOrder({ onClose, onOrderCreated }) {
             />
           </div>
         ))}
-        <button type="button" className="bg-gray-500 text-white px-2 py-1 rounded mr-2" onClick={addItem}>
-          + थप्नुहोस्
-        </button>
         <button type="submit" className="bg-green-500 text-white px-4 py-1 rounded">
-          अर्डर पठाउनुहोस्
+          अपडेट गर्नुहोस्
         </button>
         <button type="button" className="ml-2 text-red-600" onClick={onClose}>
           रद्द गर्नुहोस्
@@ -115,4 +97,4 @@ function CreateOrder({ onClose, onOrderCreated }) {
   );
 }
 
-export default CreateOrder;
+export default UpdateOrder;

@@ -2,7 +2,6 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth import authenticate
 from .models import User
 from .serializers import RegisterSerializer, UserSerializer, LoginSerializer, ResetPasswordSerializer
 from rest_framework.generics import ListAPIView
@@ -16,6 +15,7 @@ from django.utils.http import urlsafe_base64_decode
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework_simplejwt.exceptions import TokenError
 from django.conf import settings
+from django.contrib.auth import get_user_model
 
 
 # Register endpoint
@@ -35,26 +35,32 @@ class LoginView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data
 
+        # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+
         return Response({
             "user": UserSerializer(user).data,
-            "access": str(refresh.access_token),
+            "access": access_token,
             "refresh": str(refresh),
         }, status=status.HTTP_200_OK)
 
 
 # Logout (blacklist refresh token)
 class LogoutView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]  # Allow logout without access token
 
     def post(self, request):
         try:
             refresh_token = request.data.get("refresh")
+            if not refresh_token:
+                return Response({"detail": "Refresh token required"}, status=status.HTTP_400_BAD_REQUEST)
+
             token = RefreshToken(refresh_token)
             token.blacklist()
             return Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)
         except Exception:
-            return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 # Customers endpoint (admin only)
@@ -75,12 +81,32 @@ class StaffListView(ListAPIView):
         return User.objects.filter(is_staff=True)
 
 
+
+User = get_user_model()
+
 # Get currently authenticated user
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def current_user(request):
-    serializer = UserSerializer(request.user)
-    return Response(serializer.data)
+    try:
+        # Normal case: access token valid
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
+
+    except TokenError:
+        # Access token expired; try refresh
+        refresh_token = request.headers.get("x-refresh-token") or request.COOKIES.get("refresh_token")
+        if refresh_token:
+            try:
+                refresh = RefreshToken(refresh_token)
+                access = str(refresh.access_token)
+                user = User.objects.get(pk=refresh["user_id"])
+                serializer = UserSerializer(user)
+                return Response({"user": serializer.data, "access": access})
+            except (TokenError, User.DoesNotExist):
+                return Response({"detail": "Invalid or expired token"}, status=401)
+        else:
+            return Response({"detail": "Authentication credentials were not provided"}, status=401)
 
 
 class ForgotPasswordView(APIView):

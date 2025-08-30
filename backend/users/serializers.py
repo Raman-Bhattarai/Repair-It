@@ -36,7 +36,7 @@ class LoginSerializer(serializers.Serializer):
         user = authenticate(**data)
         if user and user.is_active:
             return user
-        raise serializers.ValidationError("Invalid credentials")
+        raise serializers.ValidationError({"detail": "Invalid credentials"})
 
 
 class ForgotPasswordSerializer(serializers.Serializer):

@@ -2,8 +2,8 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.decorators import action
-from .models import Order, OrderItem
-from .serializers import OrderSerializer, OrderItemSerializer
+from .models import Order
+from .serializers import OrderSerializer
 
 
 class OrderViewSet(viewsets.ModelViewSet):
@@ -13,95 +13,59 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        # Normal users see only their own orders
-        if not user.is_staff and not user.is_superuser:
+        if not user.is_staff:
             return self.queryset.filter(customer=user)
         return self.queryset
 
-    def create(self, request, *args, **kwargs):
-        """Customer creates an order"""
-        items_data = request.data.pop("items", [])
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
 
-        order = serializer.save(customer=request.user)
+    def perform_create(self, serializer):
+        serializer.save(customer=self.request.user)
 
-        # Create order items
-        for item in items_data:
-            OrderItem.objects.create(
-                order=order,
-                order_name=item.get("order_name"),
-                order_details=item.get("order_details", ""),
-                quantity=item.get("quantity", 1),
-                price=item.get("price", 0.00),
-                images=item.get("images", None)
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        instance.update_total_price()
+
+    def perform_destroy(self, instance):
+        if instance.status in [Order.Status.COMPLETED, Order.Status.REJECTED]:
+            return Response(
+                {"detail": "पूरा वा अस्वीकृत अर्डर मेटाउन मिल्दैन।"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
-
-        order.update_total_price()
-        return Response(self.get_serializer(order).data, status=status.HTTP_201_CREATED)
-
-    def update(self, request, *args, **kwargs):
-        """Update order (staff can adjust price/status, customer can update/cancel)"""
-        order = self.get_object()
-        user = request.user
-        items_data = request.data.pop("items", [])
-
-        # Customers cannot change other customers’ orders
-        if not user.is_staff and order.customer != user:
-            return Response({"detail": "अस्वीकृत"}, status=status.HTTP_403_FORBIDDEN)
-
-        # Prevent customers from changing price/status directly
-        if not user.is_staff:
-            request.data.pop("status", None)
-            request.data.pop("total_price", None)
-
-        # Apply updates
-        response = super().update(request, *args, **kwargs)
-
-        # Update items if provided
-        if items_data:
-            order.items.all().delete()
-            for item in items_data:
-                OrderItem.objects.create(
-                    order=order,
-                    order_name=item.get("order_name"),
-                    order_details=item.get("order_details", ""),
-                    quantity=item.get("quantity", 1),
-                    price=item.get("price", 0.00),
-                    images=item.get("images", None)
-                )
-            order.update_total_price()
-
-        return response
+        instance.delete()
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def cancel(self, request, pk=None):
-        """Allow customer or staff to cancel"""
         order = self.get_object()
         user = request.user
 
         if not user.is_staff and order.customer != user:
             return Response({"detail": "अस्वीकृत"}, status=status.HTTP_403_FORBIDDEN)
 
-        if order.status not in ["CANCELLED", "COMPLETED"]:
-            order.status = "CANCELLED"
+        if order.status not in [Order.Status.COMPLETED, Order.Status.REJECTED]:
+            order.status = Order.Status.REJECTED
             order.save()
 
         return Response(self.get_serializer(order).data)
 
     @action(detail=False, methods=["get"], permission_classes=[IsAdminUser])
     def reports(self, request):
-        """Admin reporting (basic)"""
         total_orders = self.queryset.count()
-        completed = self.queryset.filter(status="COMPLETED").count()
-        ongoing = self.queryset.filter(status="ON_GOING").count()
-        cancelled = self.queryset.filter(status="CANCELLED").count()
-        total_revenue = sum(order.total_price for order in self.queryset.filter(status="COMPLETED"))
+        completed = self.queryset.filter(status=Order.Status.COMPLETED).count()
+        rejected = self.queryset.filter(status=Order.Status.REJECTED).count()
+        pending = self.queryset.filter(status=Order.Status.PENDING).count()
+        total_revenue = sum(
+            order.total_price or 0
+            for order in self.queryset.filter(status=Order.Status.COMPLETED)
+        )
 
         return Response({
-            "total_orders": total_orders,
-            "completed": completed,
-            "ongoing": ongoing,
-            "cancelled": cancelled,
-            "total_revenue": total_revenue,
+            "कुल अर्डर": total_orders,
+            "पूरा भएको": completed,
+            "अस्वीकृत": rejected,
+            "प्रक्रियामा": pending,
+            "जम्मा आम्दानी": total_revenue,
         })

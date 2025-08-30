@@ -75,8 +75,8 @@ function RegisterPage() {
         refresh
       );
 
-      // 6️⃣ Redirect to menu/home
-      navigate("/menu");
+      // 6️⃣ Redirect to home
+      navigate("/");
     } catch (err) {
       console.error("Registration error:", err.response?.data || err);
 
