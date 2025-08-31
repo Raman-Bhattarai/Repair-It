@@ -4,14 +4,13 @@ import api from "../api/api";
 function StaffOrdersPage() {
   const [orders, setOrders] = useState([]);
   const [filter, setFilter] = useState("ALL");
-  const [priceInputs, setPriceInputs] = useState({}); // store temporary price inputs
+  const [priceInputs, setPriceInputs] = useState({});
 
   const fetchOrders = async () => {
     try {
       const res = await api.get("/orders/");
       setOrders(res.data);
 
-      // initialize price inputs with current total_price
       const initialPrices = {};
       res.data.forEach((order) => {
         initialPrices[order.id] = order.total_price || "";
@@ -26,7 +25,6 @@ function StaffOrdersPage() {
     fetchOrders();
   }, []);
 
-  // Generic update function using FormData
   const handleUpdate = async (id, data) => {
     try {
       const formData = new FormData();
@@ -38,14 +36,12 @@ function StaffOrdersPage() {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      // Update the specific order in state without resetting
       setOrders((prev) =>
         prev.map((order) =>
           order.id === id ? { ...order, ...res.data } : order
         )
       );
 
-      // Update local price input if total_price changed
       if (res.data.total_price !== undefined) {
         setPriceInputs((prev) => ({ ...prev, [id]: res.data.total_price }));
       }
@@ -77,13 +73,13 @@ function StaffOrdersPage() {
   ];
 
   return (
-    <div className="p-6 text-black">
-      <h1 className="text-2xl font-bold mb-4">अर्डर व्यवस्थापन</h1>
+    <div className="p-6 text-gray-900 min-h-screen bg-gray-50">
+      <h1 className="text-3xl font-bold mb-6 text-rose-600">अर्डर व्यवस्थापन</h1>
 
       <select
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
-        className="border px-2 py-1 mb-4"
+        className="border border-gray-300 rounded-lg px-3 py-2 mb-6 shadow-sm focus:ring-2 focus:ring-rose-400 focus:outline-none bg-white"
       >
         {statusOptions.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -93,29 +89,37 @@ function StaffOrdersPage() {
       </select>
 
       {visibleOrders.length === 0 && (
-        <p className="text-gray-600">कुनै अर्डर उपलब्ध छैन।</p>
+        <p className="text-gray-500 italic">कुनै अर्डर उपलब्ध छैन।</p>
       )}
 
       {visibleOrders.map((order) => (
-        <div key={order.id} className="bg-white p-4 mb-3 rounded shadow">
-          <p>
-            <strong>अर्डर #{order.id}</strong> —{" "}
-            {order.customer?.username || order.customer?.email || "ग्राहक"}
+        <div
+          key={order.id}
+          className="bg-white p-5 mb-5 rounded-2xl shadow hover:shadow-lg transition"
+        >
+          <p className="text-lg font-semibold text-gray-800">
+            अर्डर #{order.id} —{" "}
+            <span className="text-rose-600 font-medium">
+              {order.customer?.username || order.customer?.email || "ग्राहक"}
+            </span>
           </p>
-          <p>स्थिति: {order.status}</p>
+          <p className="text-sm text-gray-600 mt-1">
+            स्थिति:{" "}
+            <span className="font-medium text-blue-600">{order.status}</span>
+          </p>
 
           {/* Price input + button */}
-          <div className="mt-1 flex items-center space-x-2">
+          <div className="mt-3 flex items-center gap-2">
             <input
               type="number"
               value={priceInputs[order.id] ?? ""}
               onChange={(e) => handlePriceChange(order.id, e.target.value)}
-              className="border px-2 py-1 rounded w-32"
+              className="border border-gray-300 px-3 py-2 rounded-lg shadow-sm focus:ring-2 focus:ring-blue-400 focus:outline-none w-40"
               placeholder="रु सेट गर्नुहोस्"
             />
             <button
               onClick={() => handleSetPrice(order.id)}
-              className="px-3 py-1 bg-blue-600 text-white rounded"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
             >
               मूल्य सेट गर्नुहोस्
             </button>
@@ -123,21 +127,24 @@ function StaffOrdersPage() {
 
           {/* Order items */}
           {order.items && order.items.length > 0 && (
-            <div className="mt-2 space-y-2">
+            <div className="mt-4 space-y-3">
               {order.items.map((item) => (
-                <div key={item.id} className="border p-2 rounded">
-                  <p className="font-semibold">
+                <div
+                  key={item.id}
+                  className="border border-gray-200 p-3 rounded-lg bg-gray-50 shadow-sm"
+                >
+                  <p className="font-semibold text-gray-800">
                     {item.order_name} — मात्रा: {item.quantity}
                   </p>
-                  <p>{item.order_details}</p>
+                  <p className="text-sm text-gray-600">{item.order_details}</p>
                   {item.images && item.images.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-1">
+                    <div className="flex flex-wrap gap-2 mt-2">
                       {item.images.map((img) => (
                         <img
                           key={img.id}
                           src={img.image}
                           alt={item.order_name}
-                          className="w-20 h-20 object-cover rounded border"
+                          className="w-24 h-24 object-cover rounded-lg border border-gray-200 shadow-sm"
                         />
                       ))}
                     </div>
@@ -149,16 +156,16 @@ function StaffOrdersPage() {
 
           {/* Status buttons */}
           {order.status === "PENDING" && (
-            <div className="mt-2 space-x-2">
+            <div className="mt-4 flex gap-3">
               <button
                 onClick={() => handleUpdate(order.id, { status: "REJECTED" })}
-                className="px-3 py-1 bg-red-500 text-white rounded"
+                className="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600 transition"
               >
                 अस्वीकृत गर्नुहोस्
               </button>
               <button
                 onClick={() => handleUpdate(order.id, { status: "COMPLETED" })}
-                className="px-3 py-1 bg-green-600 text-white rounded"
+                className="px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition"
               >
                 पूरा भयो
               </button>
@@ -171,3 +178,4 @@ function StaffOrdersPage() {
 }
 
 export default StaffOrdersPage;
+

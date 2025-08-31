@@ -22,21 +22,15 @@ function LoginPage() {
     setLoading(true);
 
     try {
-      // 1️⃣ Get JWT tokens + user from backend
       const response = await loginUser(credentials);
       const { access, refresh, user } = response.data;
 
-      // 2️⃣ Store tokens in localStorage
       localStorage.setItem("access_token", access);
       localStorage.setItem("refresh_token", refresh);
 
-      // 3️⃣ Save user + tokens in context
       login(user, access, refresh);
-
-      // 4️⃣ Redirect to home page
       navigate("/");
     } catch (err) {
-      console.error("Login error:", err.response?.data || err.message);
       setError(
         err.response?.data?.detail || "अमान्य प्रयोगकर्ता नाम वा पासवर्ड"
       );
@@ -46,15 +40,15 @@ function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-rose-400 shadow-lg rounded-2xl p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-rose-600 mb-6">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-rose-100 to-rose-200 p-4">
+      <div className="bg-white shadow-2xl rounded-3xl p-10 w-full max-w-md border-t-8 border-rose-400">
+        <h2 className="text-3xl font-extrabold text-center text-rose-600 mb-6 drop-shadow-md">
           लगइन गर्नुहोस्
         </h2>
 
         {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             label="प्रयोगकर्ता नाम"
             name="username"
@@ -76,21 +70,21 @@ function LoginPage() {
           </Button>
         </form>
 
-        <div className="text-center mt-4 space-y-2">
-          <p className="text-sm text-gray-600">
+        <div className="text-center mt-6 space-y-2 text-gray-600 text-sm">
+          <p>
             खाता छैन?{" "}
             <span
               onClick={() => navigate("/register")}
-              className="text-rose-600 cursor-pointer hover:underline"
+              className="text-rose-600 cursor-pointer hover:underline font-medium"
             >
               दर्ता गर्नुहोस्
             </span>
           </p>
-          <p className="text-sm text-gray-600">
+          <p>
             पासवर्ड बिर्सिनुभयो?{" "}
             <span
               onClick={() => navigate("/forgot-password")}
-              className="text-rose-600 cursor-pointer hover:underline"
+              className="text-rose-600 cursor-pointer hover:underline font-medium"
             >
               यहाँ क्लिक गर्नुहोस्
             </span>
@@ -102,3 +96,4 @@ function LoginPage() {
 }
 
 export default LoginPage;
+

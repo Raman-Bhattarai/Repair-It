@@ -51,7 +51,16 @@ class OrderSerializer(serializers.ModelSerializer):
         return order
 
     def update(self, instance, validated_data):
-        validated_data.pop("customer", None)  # Prevent changing customer
+        request = self.context.get("request")
+
+        # prevent changing customer
+        validated_data.pop("customer", None)
+
+        if not request.user.is_staff:
+            # Customers should not be able to change total_price or status directly
+            validated_data.pop("total_price", None)
+            validated_data.pop("status", None)
+
         return super().update(instance, validated_data)
 
     def _coerce_items(self, items_data):

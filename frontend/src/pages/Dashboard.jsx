@@ -1,7 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { getOrders } from "../api/api";
 import api from "../api/api";
-import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+} from "recharts";
 
 function DashboardPage() {
   const [orders, setOrders] = useState([]);
@@ -16,7 +26,6 @@ function DashboardPage() {
         const customersRes = await api.get("users/customers/");
         const staffRes = await api.get("users/staff/");
 
-        // ✅ Use .data to get array
         setOrders(Array.isArray(ordersRes.data) ? ordersRes.data : []);
         setCustomers(Array.isArray(customersRes.data) ? customersRes.data : []);
         setStaff(Array.isArray(staffRes.data) ? staffRes.data : []);
@@ -32,15 +41,13 @@ function DashboardPage() {
     fetchData();
   }, []);
 
-  // Filter only completed orders for total sales
-  const completedOrders = orders.filter(order => order.status === "COMPLETED");
+  const completedOrders = orders.filter((o) => o.status === "COMPLETED");
 
   const totalSales = completedOrders.reduce(
     (acc, order) => acc + Number(order.total_price || 0),
     0
   );
 
-  // --- Chart Data ---
   const salesByDate = Object.values(
     completedOrders.reduce((acc, order) => {
       const date = new Date(order.created_at).toLocaleDateString();
@@ -58,55 +65,70 @@ function DashboardPage() {
 
   const COLORS = ["#facc15", "#22c55e", "#ef4444"];
 
-  if (loading) return <p className="text-center mt-20 text-black">Loading dashboard...</p>;
+  if (loading)
+    return <p className="text-center mt-20 text-gray-700 animate-pulse">Loading dashboard...</p>;
 
   return (
-    <div className="p-6 mt-16 pt-16">
-      <h1 className="text-3xl font-bold text-black mb-6 text-center">Dashboard</h1>
+    <div className="p-6 pt-16">
+      <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+        Dashboard
+      </h1>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-gray-100 p-6 rounded-xl shadow text-center">
-          <h2 className="text-xl font-semibold text-black">Total Orders</h2>
-          <p className="text-2xl font-bold mt-2 text-black">{orders.length}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div className="bg-white p-6 rounded-xl shadow-lg border text-center">
+          <h2 className="text-lg font-semibold text-gray-600">Total Orders</h2>
+          <p className="text-3xl font-bold mt-3 text-gray-900">{orders.length}</p>
         </div>
-        <div className="bg-gray-100 p-6 rounded-xl shadow text-center">
-          <h2 className="text-xl font-semibold text-black">Total Sales</h2>
-          <p className="text-2xl font-bold mt-2 text-black">Nrs.{totalSales.toFixed(2)}</p>
+        <div className="bg-white p-6 rounded-xl shadow-lg border text-center">
+          <h2 className="text-lg font-semibold text-gray-600">Total Sales</h2>
+          <p className="text-3xl font-bold mt-3 text-green-600">
+            Nrs.{totalSales.toFixed(2)}
+          </p>
         </div>
-        <div className="bg-gray-100 p-6 rounded-xl shadow text-center">
-          <h2 className="text-xl font-semibold text-black">Customers</h2>
-          <p className="text-2xl font-bold mt-2 text-black">{customers.length}</p>
+        <div className="bg-white p-6 rounded-xl shadow-lg border text-center">
+          <h2 className="text-lg font-semibold text-gray-600">Customers</h2>
+          <p className="text-3xl font-bold mt-3 text-gray-900">{customers.length}</p>
         </div>
-        <div className="bg-gray-100 p-6 rounded-xl shadow text-center">
-          <h2 className="text-xl font-semibold text-black">Staff</h2>
-          <p className="text-2xl font-bold mt-2 text-black">{staff.length}</p>
+        <div className="bg-white p-6 rounded-xl shadow-lg border text-center">
+          <h2 className="text-lg font-semibold text-gray-600">Staff</h2>
+          <p className="text-3xl font-bold mt-3 text-gray-900">{staff.length}</p>
         </div>
       </div>
 
-      {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-        {/* Sales Trend */}
-        <div className="bg-gray-100 p-6 rounded-xl shadow">
-          <h2 className="text-xl font-semibold mb-4 text-black">Sales Trend</h2>
-          <ResponsiveContainer width="100%" height={250}>
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+        <div className="bg-white p-6 rounded-xl shadow-lg border">
+          <h2 className="text-lg font-semibold mb-4 text-gray-700">Sales Trend</h2>
+          <ResponsiveContainer width="100%" height={280}>
             <LineChart data={salesByDate}>
               <XAxis dataKey="date" />
               <YAxis />
               <Tooltip />
-              <Line type="monotone" dataKey="total" stroke="#2563eb" strokeWidth={3} />
+              <Line
+                type="monotone"
+                dataKey="total"
+                stroke="#2563eb"
+                strokeWidth={3}
+                dot={{ r: 4 }}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Order Status Distribution */}
-        <div className="bg-gray-100 p-6 rounded-xl shadow">
-          <h2 className="text-xl font-semibold mb-4 text-black">Order Status</h2>
-          <ResponsiveContainer width="100%" height={250}>
+        <div className="bg-white p-6 rounded-xl shadow-lg border">
+          <h2 className="text-lg font-semibold mb-4 text-gray-700">Order Status</h2>
+          <ResponsiveContainer width="100%" height={280}>
             <PieChart>
-              <Pie data={orderStatusData} dataKey="value" nameKey="name" outerRadius={100} fill="#8884d8" label>
-                {orderStatusData.map((_, index) => (
-                  <Cell key={index} fill={COLORS[index % COLORS.length]} />
+              <Pie
+                data={orderStatusData}
+                dataKey="value"
+                nameKey="name"
+                outerRadius={110}
+                label
+              >
+                {orderStatusData.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip />
@@ -116,34 +138,37 @@ function DashboardPage() {
       </div>
 
       {/* Recent Orders */}
-      <div className="bg-gray-100 p-6 rounded-xl shadow">
-        <h2 className="text-2xl font-bold mb-4 text-black">Recent Orders</h2>
+      <div className="bg-white p-6 rounded-xl shadow-lg border">
+        <h2 className="text-xl font-bold mb-4 text-gray-700">Recent Orders</h2>
         <div className="overflow-x-auto">
-          <table className="min-w-full bg-gray-50 rounded-xl">
-            <thead className="bg-gray-200">
+          <table className="min-w-full text-sm">
+            <thead className="bg-gray-100">
               <tr>
-                <th className="p-3 text-left text-black">Order ID</th>
-                <th className="p-3 text-left text-black">Customer</th>
-                <th className="p-3 text-left text-black">Order Name</th>
-                <th className="p-3 text-left text-black">Total</th>
-                <th className="p-3 text-left text-black">Status</th>
+                <th className="p-4 text-left font-semibold text-gray-700">Order ID</th>
+                <th className="p-4 text-left font-semibold text-gray-700">Customer</th>
+                <th className="p-4 text-left font-semibold text-gray-700">Order Name</th>
+                <th className="p-4 text-left font-semibold text-gray-700">Total</th>
+                <th className="p-4 text-left font-semibold text-gray-700">Status</th>
               </tr>
             </thead>
             <tbody>
               {orders.slice(0, 5).map((order) => (
-                <tr key={order.id} className="border-b hover:bg-gray-100">
-                  <td className="p-3 text-black">{order.id}</td>
-                  <td className="p-3 text-black">{order.customer?.username}</td>
-                  <td className="p-3 text-black">{order.order_name}</td>
-                  <td className="p-3 text-black">Nrs.{Number(order.total_price).toFixed(2)}</td>
-                  <td className="p-3">
+                <tr
+                  key={order.id}
+                  className="border-t hover:bg-gray-50 transition"
+                >
+                  <td className="p-4">{order.id}</td>
+                  <td className="p-4">{order.customer?.username || "N/A"}</td>
+                  <td className="p-4">{order.order_name || "—"}</td>
+                  <td className="p-4">Nrs.{Number(order.total_price).toFixed(2)}</td>
+                  <td className="p-4">
                     <span
-                      className={`px-2 py-1 rounded-full text-white ${
+                      className={`px-3 py-1 text-xs rounded-full font-medium ${
                         order.status === "COMPLETED"
-                          ? "bg-green-600"
+                          ? "bg-green-100 text-green-700"
                           : order.status === "PENDING"
-                          ? "bg-yellow-500"
-                          : "bg-red-600"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-red-100 text-red-700"
                       }`}
                     >
                       {order.status}
@@ -151,6 +176,13 @@ function DashboardPage() {
                   </td>
                 </tr>
               ))}
+              {orders.length === 0 && (
+                <tr>
+                  <td colSpan="5" className="p-6 text-center text-gray-500">
+                    No recent orders available.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
@@ -160,3 +192,4 @@ function DashboardPage() {
 }
 
 export default DashboardPage;
+

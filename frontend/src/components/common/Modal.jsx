@@ -4,16 +4,16 @@ function Modal({ isOpen, onClose, title, children }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-lg max-w-lg w-full p-6 relative">
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+      <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full p-6 relative animate-fadeIn">
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 font-bold"
+          className="absolute top-3 right-3 text-gray-500 hover:text-gray-800 transition-colors"
         >
           ✕
         </button>
-        {title && <h2 className="text-xl font-bold mb-4">{title}</h2>}
-        <div>{children}</div>
+        {title && <h2 className="text-2xl font-bold mb-4 text-gray-900">{title}</h2>}
+        <div className="text-gray-700">{children}</div>
       </div>
     </div>
   );

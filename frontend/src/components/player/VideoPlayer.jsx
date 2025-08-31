@@ -32,7 +32,13 @@ function VideoPlayer({ sources, width = "w-96", height = "h-56" }) {
   };
 
   return (
-    <div className={`relative ${width} ${height} mx-auto rounded-xl shadow-lg overflow-hidden`}>
+    <div
+      className={`relative ${width} ${height} mx-auto rounded-2xl shadow-2xl overflow-hidden 
+      border border-gray-300 bg-gray-900 group`}
+    >
+      {/* Overlay Glow */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-transparent to-black/30 z-10 pointer-events-none"></div>
+
       {/* Video A */}
       <video
         ref={videoRefs[0]}
@@ -42,9 +48,8 @@ function VideoPlayer({ sources, width = "w-96", height = "h-56" }) {
         playsInline
         preload="auto"
         onEnded={handleEnded}
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-          showFirst ? "opacity-100" : "opacity-0"
-        }`}
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out
+          ${showFirst ? "opacity-100" : "opacity-0"}`}
       />
 
       {/* Video B */}
@@ -54,12 +59,15 @@ function VideoPlayer({ sources, width = "w-96", height = "h-56" }) {
         muted
         playsInline
         preload="auto"
-        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-          showFirst ? "opacity-0" : "opacity-100"
-        }`}
+        className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out
+          ${showFirst ? "opacity-0" : "opacity-100"}`}
       />
+
+      {/* Hover Border Highlight */}
+      <div className="absolute inset-0 border-2 border-transparent group-hover:border-rose-500/70 rounded-2xl transition"></div>
     </div>
   );
 }
 
 export default VideoPlayer;
+

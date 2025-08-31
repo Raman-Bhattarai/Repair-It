@@ -19,37 +19,45 @@ function StaffPage() {
     fetchStaff();
   }, []);
 
-  if (loading) return <p className="text-center mt-20">Loading staff...</p>;
-  if (staff.length === 0) return <p className="text-center mt-20">No staff found.</p>;
+  if (loading) return <p className="text-center mt-20 text-gray-600">Loading staff...</p>;
+  if (staff.length === 0) return <p className="text-center mt-20 text-gray-600">No staff found.</p>;
 
   return (
     <div className="p-6 pt-16">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">Staff Members</h1>
+      <h1 className="text-3xl font-extrabold text-gray-900 mb-6 text-center">
+        Staff Members
+      </h1>
 
       <div className="overflow-x-auto">
-        <table className="min-w-full bg-emerald-500 rounded-xl shadow">
-          <thead>
-            <tr className="border-b">
-              <th className="p-3 text-left">Username</th>
-              <th className="p-3 text-left">Email</th>
-              <th className="p-3 text-left">Phone</th>
-              <th className="p-3 text-left">Is Staff</th>
-            </tr>
-          </thead>
-          <tbody>
-            {staff.map((s) => (
-              <tr key={s.id} className="border-b">
-                <td className="p-3">{s.username}</td>
-                <td className="p-3">{s.email}</td>
-                <td className="p-3">{s.phone}</td>
-                <td className="p-3">{s.is_staff ? "Yes" : "No"}</td>
+        <div className="bg-gradient-to-r from-emerald-200 to-emerald-400 rounded-2xl shadow-xl overflow-hidden">
+          <table className="min-w-full text-left text-gray-800">
+            <thead className="bg-emerald-600 text-white">
+              <tr>
+                <th className="p-4 font-semibold">Username</th>
+                <th className="p-4 font-semibold">Email</th>
+                <th className="p-4 font-semibold">Phone</th>
+                <th className="p-4 font-semibold">Is Staff</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {staff.map((s) => (
+                <tr
+                  key={s.id}
+                  className="border-b border-emerald-300 hover:bg-emerald-100 transition"
+                >
+                  <td className="p-4">{s.username}</td>
+                  <td className="p-4">{s.email}</td>
+                  <td className="p-4">{s.phone}</td>
+                  <td className="p-4">{s.is_staff ? "✅ Yes" : "❌ No"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
 }
 
 export default StaffPage;
+

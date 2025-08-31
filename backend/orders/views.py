@@ -23,35 +23,30 @@ class OrderViewSet(viewsets.ModelViewSet):
         return context
 
     def perform_create(self, serializer):
-        # DO NOT pass customer here; serializer already handles it
-        serializer.save()
-
+        serializer.save() # DO NOT pass customer here; serializer already handles it
 
     def perform_update(self, serializer):
+        request = self.request
         order = serializer.save()
 
-        request = self.request
-        items_data = request.data.get("items_payload")
-        if isinstance(items_data, str):
-            try:
-                items_data = json.loads(items_data)
-            except json.JSONDecodeError:
-                items_data = []
+        # only allow customers to update items, not total_price
+        if not request.user.is_staff:
+            items_data = request.data.get("items_payload")
+            if isinstance(items_data, str):
+                try:
+                    items_data = json.loads(items_data)
+                except json.JSONDecodeError:
+                    items_data = []
 
-        if items_data:
-            # Clear existing items if you want to replace them entirely
-            order.items.all().delete()
+            if items_data:
+                order.items.all().delete()
+                for idx, item_data in enumerate(items_data):
+                    order_item = OrderItem.objects.create(order=order, **item_data)
+                    files = request.FILES.getlist(f"item_images_{idx}")
+                    for f in files:
+                        OrderItemImage.objects.create(item=order_item, image=f)
 
-            for idx, item_data in enumerate(items_data):
-                order_item = OrderItem.objects.create(order=order, **item_data)
-
-                # Handle uploaded files for this item
-                files = request.FILES.getlist(f"item_images_{idx}")
-                for f in files:
-                    OrderItemImage.objects.create(item=order_item, image=f)
-
-        # Recalculate total price
-        order.update_total_price()
+            order.update_total_price()
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

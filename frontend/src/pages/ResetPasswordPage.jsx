@@ -5,7 +5,7 @@ import Input from "../components/auth/Input";
 import Button from "../components/auth/Button";
 
 function ResetPasswordPage() {
-  const { uid, token } = useParams(); // URL params
+  const { uid, token } = useParams();
   const navigate = useNavigate();
 
   const [password, setPassword] = useState("");
@@ -26,7 +26,7 @@ function ResetPasswordPage() {
         confirm_password: confirmPassword,
       });
       setMessage(res.data.message);
-      setTimeout(() => navigate("/login"), 3000); // Redirect to login after success
+      setTimeout(() => navigate("/login"), 3000);
     } catch (err) {
       setError(err.response?.data?.error || "कुनै समस्या भयो। कृपया फेरि प्रयास गर्नुहोस्।");
     } finally {
@@ -35,16 +35,16 @@ function ResetPasswordPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
-      <div className="bg-rose-400 shadow-lg rounded-2xl p-8 w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center text-rose-600 mb-6">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-rose-100 to-rose-200 p-4">
+      <div className="bg-white shadow-2xl rounded-3xl p-10 w-full max-w-md border-t-8 border-rose-400">
+        <h2 className="text-3xl font-extrabold text-center text-rose-600 mb-6 drop-shadow-md">
           नयाँ पासवर्ड सेट गर्नुहोस्
         </h2>
 
-        {message && <p className="text-green-500 mb-4 text-center">{message}</p>}
-        {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
+        {message && <p className="text-green-500 mb-4 text-center font-medium">{message}</p>}
+        {error && <p className="text-red-500 mb-4 text-center font-medium">{error}</p>}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             label="नयाँ पासवर्ड"
             type="password"
@@ -70,3 +70,4 @@ function ResetPasswordPage() {
 }
 
 export default ResetPasswordPage;
+

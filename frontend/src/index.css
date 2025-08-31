@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* Global root variables */
 :root {
   font-family: system-ui, Helvetica, Arial, sans-serif;
   line-height: 1.5;
@@ -15,27 +16,23 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-a {
-  color: #2f3153;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #0c0e38;
-}
-
+/* Ensure full page and body sizing */
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+
+  /* Make Tailwind background and text classes override safely */
+  background-color: inherit;
+  color: inherit;
 }
 
+/* Default button styling */
 button {
   border-radius: 12px;
-  font-size: 1em;
-  font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.25s, background-color 0.25s, color 0.25s;
 }
 button:hover {
   border-color: #646cff;
@@ -45,6 +42,7 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+/* Light color scheme */
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -57,3 +55,11 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* Prevent global styles from overriding Tailwind utility classes */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+

@@ -4,23 +4,23 @@ import VideoPlayer from "../components/player/VideoPlayer";
 
 function HomePage() {
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50 pt-50">
       {/* Hero Section */}
-      <div className="bg-cyan-100 text-cyan-700 py-12 shadow-md">
+      <div className="bg-gradient-to-r from-cyan-400 to-cyan-600 text-white py-16 shadow-lg">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow">
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-lg">
             रिपेयर इट
           </h1>
-          <p className="text-lg md:text-xl font-medium">
+          <p className="text-lg md:text-xl font-medium opacity-90">
             छिटो र भरपर्दो उपकरण मर्मतका लागि तपाईंको विश्वासिलो साझेदार
           </p>
         </div>
       </div>
 
       {/* About Section */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-6 grid md:grid-cols-2 gap-12 items-center">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16 grid md:grid-cols-2 gap-12 items-center">
         <div>
-          <h2 className="text-3xl font-bold mb-4 text-gray-800">हाम्रो बारेमा</h2>
+          <h2 className="text-3xl font-bold mb-4 text-gray-900">हाम्रो बारेमा</h2>
           <p className="text-gray-700 mb-4 leading-relaxed">
             रिपेयर इटमा, हामी फ्रिज, वाशिङ मेसिन, ओभन लगायत विभिन्न घरायसी
             उपकरणहरूको मर्मतमा विशेषज्ञता राख्छौं। हाम्रो अनुभवी प्राविधिक टोली
@@ -37,24 +37,24 @@ function HomePage() {
           <img
             src="/images/OIP.jpeg"
             alt="Repair Service"
-            className="rounded-2xl shadow-xl w-full hover:scale-105 transition-transform duration-300"
+            className="rounded-2xl shadow-2xl w-full hover:scale-105 transition-transform duration-500"
           />
         </div>
       </div>
 
       {/* Repair Videos Section */}
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-15 space-y-20">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-20 space-y-20">
         {/* Fridge Repair */}
         <div className="grid md:grid-cols-2 gap-10 items-center">
           <VideoPlayer
             sources={[
-              "/videos/fridge/1.mp4", 
-              "/videos/fridge/2.mp4", 
-              "/videos/fridge/3.mp4"
+              "/videos/fridge/1.mp4",
+              "/videos/fridge/2.mp4",
+              "/videos/fridge/3.mp4",
             ]}
           />
           <div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-3">
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
               फ्रिज मर्मत सेवा
             </h3>
             <p className="text-gray-700 leading-relaxed">
@@ -68,7 +68,7 @@ function HomePage() {
         {/* Washing Machine Repair */}
         <div className="grid md:grid-cols-2 gap-10 items-center">
           <div className="order-2 md:order-1">
-            <h3 className="text-2xl font-bold text-gray-800 mb-3">
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
               वाशिङ मेसिन मर्मत
             </h3>
             <p className="text-gray-700 leading-relaxed">
@@ -77,11 +77,11 @@ function HomePage() {
               कपडा धुने कार्यलाई फेरि सहज बनाउनेछौं।
             </p>
           </div>
-          <VideoPlayer 
+          <VideoPlayer
             sources={[
               "/videos/washing/1.mp4",
               "/videos/washing/2.mp4",
-              "/videos/washing/3.mp4"
+              "/videos/washing/3.mp4",
             ]}
           />
         </div>
@@ -89,13 +89,10 @@ function HomePage() {
         {/* AC Repair */}
         <div className="grid md:grid-cols-2 gap-10 items-center">
           <VideoPlayer
-            sources={[
-              "/videos/AC/1.mp4", 
-              "/videos/AC/2.mp4"
-            ]}
+            sources={["/videos/AC/1.mp4", "/videos/AC/2.mp4"]}
           />
           <div>
-            <h3 className="text-2xl font-bold text-gray-800 mb-3">
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">
               एयर कन्डिसनर मर्मत
             </h3>
             <p className="text-gray-700 leading-relaxed">
@@ -108,15 +105,15 @@ function HomePage() {
       </div>
 
       {/* Call-to-Action Section */}
-      <div className="bg-gradient-to-r from-red-400 to-rose-500 py-20 text-center text-white">
+      <div className="bg-gradient-to-r from-rose-500 to-red-500 py-20 text-center text-white">
         <h2 className="text-3xl font-extrabold mb-4">मर्मत आवश्यक छ?</h2>
-        <p className="text-lg md:text-xl mb-6 max-w-2xl mx-auto">
+        <p className="text-lg md:text-xl mb-6 max-w-2xl mx-auto opacity-90">
           हाम्रो सजिलो अर्डर प्रणाली मार्फत तपाईं हाम्रो मर्मत सेवाको अर्डर राख्न
           सक्नुहुन्छ। सुरु गर्न तल क्लिक गर्नुहोस्!
         </p>
         <Link
           to="/order"
-          className="bg-white text-rose-600 font-semibold py-3 px-6 rounded-xl shadow hover:bg-gray-100 transition"
+          className="bg-white text-rose-600 font-semibold py-3 px-8 rounded-xl shadow-lg hover:bg-gray-100 transition"
         >
           अर्डर गर्नुहोस्
         </Link>
@@ -124,7 +121,7 @@ function HomePage() {
           वा हामीलाई सम्पर्क गर्नुहोस्:{" "}
           <span className="underline">+977-9800000000</span>
         </p>
-        <p className="text-lg mt-3">
+        <p className="text-lg mt-3 opacity-90">
           हाम्रो टोली तपाईंको समस्या छिटो समाधान गर्न तयार छ!
         </p>
       </div>
@@ -133,3 +130,4 @@ function HomePage() {
 }
 
 export default HomePage;
+

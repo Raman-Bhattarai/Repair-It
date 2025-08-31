@@ -65,62 +65,74 @@ function CreateOrder({ onClose, onOrderCreated }) {
   };
 
   return (
-    <div className="border p-4 rounded bg-gray-50 text-black">
-      <h3 className="font-bold mb-2">नयाँ अर्डर</h3>
-      {error && <div className="text-red-600 mb-2 text-sm break-words">{error}</div>}
-      <form onSubmit={handleSubmit}>
-        {items.map((item, idx) => (
-          <div key={idx} className="mb-3 border p-2 rounded">
-            <label className="block text-sm">उपकरण प्रकार</label>
-            <select
-              className="border p-1 w-full"
-              value={item.order_name}
-              onChange={(e) => handleItemChange(idx, "order_name", e.target.value)}
-              required
-            >
-              <option value="">छान्नुहोस्</option>
-              <option value="FRIDGE">फ्रिज</option>
-              <option value="WASHING_MACHINE">वाशिङ मेसिन</option>
-              <option value="OVEN">अभन</option>
-              <option value="TV">टेलिभिजन</option>
-              <option value="FAN">पंखा</option>
-              <option value="OTHER">अन्य</option>
-            </select>
+    <div className="border p-6 rounded-xl bg-white shadow-sm">
+  <h3 className="text-lg font-bold mb-4">नयाँ अर्डर</h3>
+  {error && <div className="text-red-600 mb-3 text-sm">{error}</div>}
+  <form onSubmit={handleSubmit} className="space-y-4">
+    {items.map((item, idx) => (
+      <div key={idx} className="p-4 border rounded-lg bg-gray-50 shadow-sm space-y-2">
+        <label className="block text-sm font-semibold text-gray-700">उपकरण प्रकार</label>
+        <select
+          className="border rounded-lg w-full px-3 py-2 focus:ring-2 focus:ring-rose-400 focus:outline-none"
+          value={item.order_name}
+          onChange={(e) => handleItemChange(idx, "order_name", e.target.value)}
+          required
+        >
+          <option value="">छान्नुहोस्</option>
+          <option value="FRIDGE">फ्रिज</option>
+          <option value="WASHING_MACHINE">वाशिङ मेसिन</option>
+          <option value="OVEN">अभन</option>
+          <option value="TV">टेलिभिजन</option>
+          <option value="FAN">पंखा</option>
+          <option value="OTHER">अन्य</option>
+        </select>
 
-            <textarea
-              className="border p-1 w-full mt-1"
-              placeholder="समस्या विवरण"
-              value={item.order_details}
-              onChange={(e) => handleItemChange(idx, "order_details", e.target.value)}
-            />
+        <textarea
+          className="border rounded-lg w-full px-3 py-2 mt-1 focus:ring-2 focus:ring-rose-400 focus:outline-none"
+          placeholder="समस्या विवरण"
+          value={item.order_details}
+          onChange={(e) => handleItemChange(idx, "order_details", e.target.value)}
+        />
 
-            <input
-              type="number"
-              className="border p-1 w-full mt-1"
-              value={item.quantity}
-              onChange={(e) => handleItemChange(idx, "quantity", e.target.value)}
-              min="1"
-            />
+        <input
+          type="number"
+          className="border rounded-lg w-full px-3 py-2 mt-1 focus:ring-2 focus:ring-rose-400 focus:outline-none"
+          value={item.quantity}
+          onChange={(e) => handleItemChange(idx, "quantity", e.target.value)}
+          min="1"
+        />
 
-            <input
-              type="file"
-              multiple
-              className="mt-2"
-              onChange={(e) => handleImageChange(idx, e.target.files)}
-            />
-          </div>
-        ))}
-        <button type="button" className="bg-gray-500 text-white px-2 py-1 rounded mr-2" onClick={addItem}>
-          + थप्नुहोस्
-        </button>
-        <button type="submit" disabled={submitting} className="bg-green-500 text-white px-4 py-1 rounded">
-          {submitting ? "पठाउँदै..." : "अर्डर पठाउनुहोस्"}
-        </button>
-        <button type="button" className="ml-2 text-red-600" onClick={onClose}>
-          रद्द गर्नुहोस्
-        </button>
-      </form>
+        <input
+          type="file"
+          multiple
+          className="mt-2 text-sm"
+          onChange={(e) => handleImageChange(idx, e.target.files)}
+        />
+      </div>
+    ))}
+
+    <div className="flex items-center space-x-2">
+      <button
+        type="button"
+        className="bg-gray-600 text-white px-3 py-2 rounded-lg shadow-sm hover:bg-gray-700 transition"
+        onClick={addItem}
+      >
+        + थप्नुहोस्
+      </button>
+      <button
+        type="submit"
+        disabled={submitting}
+        className="bg-green-600 text-white px-5 py-2 rounded-lg shadow-sm hover:bg-green-700 transition disabled:opacity-70"
+      >
+        {submitting ? "पठाउँदै..." : "अर्डर पठाउनुहोस्"}
+      </button>
+      <button type="button" className="ml-2 text-red-600 font-semibold hover:underline" onClick={onClose}>
+        रद्द गर्नुहोस्
+      </button>
     </div>
+  </form>
+</div>
+
   );
 }
 

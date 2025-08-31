@@ -75,105 +75,125 @@ function UpdateOrder({ order, onClose, onOrderUpdated }) {
   };
 
   return (
-    <div className="border p-4 rounded bg-gray-50 text-black">
-      <h3 className="font-bold mb-2">अर्डर #{order.id} सम्पादन</h3>
-      {error && <div className="text-red-600 mb-2 text-sm break-words">{error}</div>}
+    <div className="border p-6 rounded-xl bg-white shadow-sm">
+  <h3 className="text-lg font-bold mb-4">अर्डर #{order.id} सम्पादन</h3>
+  {error && <div className="text-red-600 mb-3 text-sm">{error}</div>}
 
-      <div className="mb-3">
-        <label className="block text-sm">स्थिति</label>
-        <select className="border p-1 w-full" value={status} onChange={(e)=>setStatus(e.target.value)}>
-          <option value="PENDING">प्रक्रियामा</option>
-          <option value="COMPLETED">पूरा भएको</option>
-          <option value="REJECTED">अस्वीकृत</option>
-          <option value="CANCELLED">रद्द गरिएको</option>
+  <div className="mb-4">
+    <label className="block text-sm font-semibold text-gray-700">स्थिति</label>
+    <select
+      className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-rose-400 focus:outline-none"
+      value={status}
+      onChange={(e) => setStatus(e.target.value)}
+    >
+      <option value="PENDING">प्रक्रियामा</option>
+      <option value="COMPLETED">पूरा भएको</option>
+      <option value="REJECTED">अस्वीकृत</option>
+      <option value="CANCELLED">रद्द गरिएको</option>
+    </select>
+  </div>
+
+  <form onSubmit={handleSubmit} className="space-y-4">
+    {items.map((item, idx) => (
+      <div key={idx} className="p-4 border rounded-lg bg-gray-50 shadow-sm space-y-2">
+        <label className="block text-sm font-semibold text-gray-700">उपकरण</label>
+        <select
+          className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-rose-400 focus:outline-none"
+          value={item.order_name}
+          onChange={(e) => handleItemChange(idx, "order_name", e.target.value)}
+          required
+        >
+          <option value="FRIDGE">फ्रिज</option>
+          <option value="WASHING_MACHINE">वाशिङ मेसिन</option>
+          <option value="OVEN">अभन</option>
+          <option value="TV">टेलिभिजन</option>
+          <option value="FAN">पंखा</option>
+          <option value="OTHER">अन्य</option>
         </select>
-      </div>
 
-      <form onSubmit={handleSubmit}>
-        {items.map((item, idx) => (
-          <div key={idx} className="mb-3 border p-2 rounded">
-            <label className="block text-sm">उपकरण</label>
-            <select
-              className="border p-1 w-full"
-              value={item.order_name}
-              onChange={(e) => handleItemChange(idx, "order_name", e.target.value)}
-              required
-            >
-              <option value="FRIDGE">फ्रिज</option>
-              <option value="WASHING_MACHINE">वाशिङ मेसिन</option>
-              <option value="OVEN">अभन</option>
-              <option value="TV">टेलिभिजन</option>
-              <option value="FAN">पंखा</option>
-              <option value="OTHER">अन्य</option>
-            </select>
+        <textarea
+          className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-rose-400 focus:outline-none"
+          value={item.order_details}
+          onChange={(e) => handleItemChange(idx, "order_details", e.target.value)}
+        />
 
-            <textarea
-              className="border p-1 w-full mt-1"
-              value={item.order_details}
-              onChange={(e) => handleItemChange(idx, "order_details", e.target.value)}
-            />
-
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="block text-sm">परिमाण</label>
-                <input
-                  type="number"
-                  className="border p-1 w-full"
-                  value={item.quantity}
-                  onChange={(e) => handleItemChange(idx, "quantity", e.target.value)}
-                  min="1"
-                />
-              </div>
-              <div>
-                <label className="block text-sm">मूल्य</label>
-                <input
-                  type="number"
-                  className="border p-1 w-full"
-                  value={item.price}
-                  onChange={(e) => handleItemChange(idx, "price", e.target.value)}
-                  min="0"
-                />
-              </div>
-            </div>
-
-            <div className="mt-2">
-              <div className="text-sm font-semibold mb-1">पहिलेका फोटोहरू</div>
-              <div className="flex flex-wrap gap-2">
-                {(item.images || []).map((img) => (
-                  <div key={img.id} className="relative">
-                    <img src={img.image} alt="" className="w-20 h-20 object-cover border" />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveExistingImage(idx, img.id)}
-                      className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-5 h-5"
-                      title="हटाउनुहोस्"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700">परिमाण</label>
             <input
-              type="file"
-              multiple
-              className="mt-2"
-              onChange={(e) => handleImageAdd(idx, e.target.files)}
+              type="number"
+              className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-rose-400 focus:outline-none"
+              value={item.quantity}
+              onChange={(e) => handleItemChange(idx, "quantity", e.target.value)}
+              min="1"
             />
           </div>
-        ))}
-        <button type="button" className="bg-gray-500 text-white px-2 py-1 rounded mr-2" onClick={addNewItem}>
-          + नयाँ वस्तु
-        </button>
-        <button type="submit" disabled={submitting} className="bg-green-500 text-white px-4 py-1 rounded">
-          {submitting ? "अपडेट हुँदै..." : "अपडेट गर्नुहोस्"}
-        </button>
-        <button type="button" className="ml-2 text-red-600" onClick={onClose}>
-          रद्द गर्नुहोस्
-        </button>
-      </form>
+          <div>
+            <label className="block text-sm font-semibold text-gray-700">मूल्य</label>
+            <input
+              type="number"
+              className="border rounded-lg px-3 py-2 w-full focus:ring-2 focus:ring-rose-400 focus:outline-none"
+              value={item.price}
+              onChange={(e) => handleItemChange(idx, "price", e.target.value)}
+              min="0"
+            />
+          </div>
+        </div>
+
+        <div className="mt-3">
+          <div className="text-sm font-semibold text-gray-700 mb-1">पहिलेका फोटोहरू</div>
+          <div className="flex flex-wrap gap-2">
+            {(item.images || []).map((img) => (
+              <div key={img.id} className="relative">
+                <img
+                  src={img.image}
+                  alt=""
+                  className="w-20 h-20 object-cover border rounded-lg shadow-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveExistingImage(idx, img.id)}
+                  className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center shadow"
+                  title="हटाउनुहोस्"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <input
+          type="file"
+          multiple
+          className="mt-2 text-sm"
+          onChange={(e) => handleImageAdd(idx, e.target.files)}
+        />
+      </div>
+    ))}
+
+    <div className="flex items-center space-x-2">
+      <button
+        type="button"
+        className="bg-gray-600 text-white px-3 py-2 rounded-lg shadow-sm hover:bg-gray-700 transition"
+        onClick={addNewItem}
+      >
+        + नयाँ वस्तु
+      </button>
+      <button
+        type="submit"
+        disabled={submitting}
+        className="bg-green-600 text-white px-5 py-2 rounded-lg shadow-sm hover:bg-green-700 transition disabled:opacity-70"
+      >
+        {submitting ? "अपडेट हुँदै..." : "अपडेट गर्नुहोस्"}
+      </button>
+      <button type="button" className="ml-2 text-red-600 font-semibold hover:underline" onClick={onClose}>
+        रद्द गर्नुहोस्
+      </button>
     </div>
+  </form>
+</div>
+
   );
 }
 

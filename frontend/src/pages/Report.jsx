@@ -9,7 +9,7 @@ function ReportPage() {
     const fetchOrders = async () => {
       try {
         const res = await getOrders();
-        setOrders(Array.isArray(res.data) ? res.data : []); // ensure array
+        setOrders(Array.isArray(res.data) ? res.data : []);
       } catch (err) {
         console.error(err);
         setOrders([]);
@@ -20,8 +20,7 @@ function ReportPage() {
     fetchOrders();
   }, []);
 
-  // Filter only completed orders
-  const completedOrders = orders.filter(order => order.status === "COMPLETED");
+  const completedOrders = orders.filter((order) => order.status === "COMPLETED");
 
   const totalSales = completedOrders.reduce(
     (acc, order) => acc + Number(order.total_price || 0),
@@ -30,41 +29,51 @@ function ReportPage() {
 
   const totalOrders = completedOrders.length;
 
-  if (loading) return <p className="text-center mt-20 text-black">Loading report...</p>;
+  if (loading)
+    return <p className="text-center mt-20 text-gray-700 animate-pulse">Loading report...</p>;
 
   return (
     <div className="p-6 pt-16">
-      <h1 className="text-3xl font-bold text-black mb-6 text-center">Reports</h1>
+      <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+        Reports
+      </h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-6">
-        <div className="bg-gray-100 p-6 rounded-xl shadow text-center">
-          <h2 className="text-xl font-semibold text-black">Total Orders</h2>
-          <p className="text-2xl font-bold mt-2 text-black">{totalOrders}</p>
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+        <div className="bg-white p-6 rounded-xl shadow-lg border text-center">
+          <h2 className="text-lg font-semibold text-gray-600">Total Orders</h2>
+          <p className="text-3xl font-bold mt-3 text-gray-900">{totalOrders}</p>
         </div>
-        <div className="bg-gray-100 p-6 rounded-xl shadow text-center">
-          <h2 className="text-xl font-semibold text-black">Total Sales</h2>
-          <p className="text-2xl font-bold mt-2 text-black">Nrs.{totalSales.toFixed(2)}</p>
+        <div className="bg-white p-6 rounded-xl shadow-lg border text-center">
+          <h2 className="text-lg font-semibold text-gray-600">Total Sales</h2>
+          <p className="text-3xl font-bold mt-3 text-green-600">
+            Nrs.{totalSales.toFixed(2)}
+          </p>
         </div>
       </div>
 
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-gray-50 rounded-xl shadow">
-          <thead className="bg-gray-200">
+      {/* Orders Table */}
+      <div className="bg-white rounded-xl shadow-lg border overflow-hidden">
+        <table className="min-w-full text-sm">
+          <thead className="bg-gray-100">
             <tr>
-              <th className="p-3 text-left text-black">Order ID</th>
-              <th className="p-3 text-left text-black">Customer</th>
-              <th className="p-3 text-left text-black">Total</th>
-              <th className="p-3 text-left text-black">Status</th>
+              <th className="p-4 text-left font-semibold text-gray-700">Order ID</th>
+              <th className="p-4 text-left font-semibold text-gray-700">Customer</th>
+              <th className="p-4 text-left font-semibold text-gray-700">Total</th>
+              <th className="p-4 text-left font-semibold text-gray-700">Status</th>
             </tr>
           </thead>
           <tbody>
             {completedOrders.map((order) => (
-              <tr key={order.id} className="border-b hover:bg-gray-100">
-                <td className="p-3 text-black">{order.id}</td>
-                <td className="p-3 text-black">{order.customer?.username}</td>
-                <td className="p-3 text-black">Nrs.{Number(order.total_price).toFixed(2)}</td>
-                <td className="p-3">
-                  <span className="px-2 py-1 rounded-full text-white bg-green-600">
+              <tr
+                key={order.id}
+                className="border-t hover:bg-gray-50 transition"
+              >
+                <td className="p-4">{order.id}</td>
+                <td className="p-4">{order.customer?.username || "N/A"}</td>
+                <td className="p-4">Nrs.{Number(order.total_price).toFixed(2)}</td>
+                <td className="p-4">
+                  <span className="px-3 py-1 text-xs rounded-full font-medium bg-green-100 text-green-700">
                     {order.status}
                   </span>
                 </td>
@@ -72,7 +81,7 @@ function ReportPage() {
             ))}
             {completedOrders.length === 0 && (
               <tr>
-                <td colSpan="4" className="p-3 text-center text-black">
+                <td colSpan="4" className="p-6 text-center text-gray-500">
                   No completed orders found.
                 </td>
               </tr>
@@ -85,3 +94,4 @@ function ReportPage() {
 }
 
 export default ReportPage;
+

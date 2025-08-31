@@ -28,11 +28,11 @@ function OrdersPage() {
   }, []);
 
   return (
-    <div className="p-4 text-black">
-      <h2 className="text-xl font-bold mb-4">मेरा अर्डरहरू</h2>
+    <div className="p-6 text-gray-900 mx-auto max-w-4xl">
+      <h2 className="text-2xl font-bold mb-6">मेरा अर्डरहरू</h2>
 
       <button
-        className="bg-blue-500 text-white px-4 py-2 rounded mb-4"
+        className="bg-rose-600 text-white px-5 py-2 rounded-lg shadow hover:bg-rose-700 transition mb-6"
         onClick={() => setShowCreate(true)}
       >
         नयाँ अर्डर बनाउनुहोस्
@@ -54,30 +54,41 @@ function OrdersPage() {
       )}
 
       {selectedOrder && (
-        <OrderDetails order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+        <OrderDetails
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+        />
       )}
 
       {loading ? (
-        <p>लोड हुँदै...</p>
+        <p className="text-gray-600">लोड हुँदै...</p>
       ) : orders.length === 0 ? (
-        <p>अहिलेसम्म कुनै अर्डर छैन। नयाँ अर्डर बनाउन सुरु गर्नुहोस्।</p>
+        <p className="text-gray-600">
+          अहिलेसम्म कुनै अर्डर छैन। नयाँ अर्डर बनाउन सुरु गर्नुहोस्।
+        </p>
       ) : (
-        <ul className="space-y-2">
+        <ul className="space-y-4">
           {orders.map((order) => (
             <li
               key={order.id}
-              className="border p-2 rounded cursor-pointer hover:bg-gray-100 flex justify-between"
+              className="border border-gray-200 p-4 rounded-lg shadow-sm cursor-pointer hover:shadow-md transition flex justify-between items-center"
             >
-              <span onClick={() => setSelectedOrder(order)}>
-                अर्डर #{order.id} | स्थिति: {order.status} | जम्मा: Rs.{" "}
+              <span
+                onClick={() => setSelectedOrder(order)}
+                className="text-gray-800 font-medium"
+              >
+                अर्डर #{order.id} | स्थिति:{" "}
+                <span className="font-semibold">{order.status}</span> | जम्मा: Rs.{" "}
                 {order.total_price ?? 0}
               </span>
-              <button
-                onClick={() => setShowUpdate(order)}
-                className="bg-yellow-500 text-white px-2 py-1 rounded"
-              >
-                सम्पादन
-              </button>
+              {["PENDING"].includes(order.status) && (
+                <button
+                  onClick={() => setShowUpdate(order)}
+                  className="bg-yellow-500 text-white px-3 py-1 rounded-lg shadow hover:bg-yellow-600 transition"
+                >
+                  सम्पादन
+                </button>
+              )}
             </li>
           ))}
         </ul>
@@ -87,3 +98,4 @@ function OrdersPage() {
 }
 
 export default OrdersPage;
+
