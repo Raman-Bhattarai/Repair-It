@@ -2,7 +2,6 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://localhost:8000/api",
-  headers: { "Content-Type": "application/json" },
 });
 
 // Attach JWT access token automatically
@@ -33,11 +32,12 @@ api.interceptors.response.use(
             refresh: refreshToken,
           });
 
-          const { access } = res.data;
-          localStorage.setItem("access_token", access);
+            const { access } = res.data;
+            localStorage.setItem("access_token", access);
 
-          originalRequest.headers.Authorization = `Bearer ${access}`;
-          return api(originalRequest);
+            originalRequest.headers = originalRequest.headers || {};
+            originalRequest.headers.Authorization = `Bearer ${access}`;
+            return api(originalRequest);
         } catch (err) {
           // Refresh failed, force logout
           localStorage.removeItem("access_token");
@@ -72,13 +72,12 @@ export const forgotPassword = (email) => api.post("/forgot-password/", { email }
 export const getUserProfile = () => api.get("/user/me/");
 
 // Orders
-export const placeOrder = (orderData) => {
-  return api.post("/orders/", orderData);
-};
+export const placeOrder = (formData) =>
+  api.post("/orders/", formData, { headers: { "Content-Type": "multipart/form-data" } });
+
 export const getOrders = () => api.get("/orders/");
-export const updateOrder = (id, data) => api.patch(`/orders/${id}/`, data);
-export const cancelOrder = async (orderId) => {
-  return await api.post(`/orders/${orderId}/cancel/`);
-};
+export const updateOrder = (id, formData) =>
+  api.put(`/orders/${id}/`, formData, { headers: { "Content-Type": "multipart/form-data" } });
+export const cancelOrder = (orderId) => api.post(`/orders/${orderId}/cancel/`);
 
 export default api;

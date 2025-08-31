@@ -3,12 +3,20 @@ import api from "../api/api";
 
 function StaffOrdersPage() {
   const [orders, setOrders] = useState([]);
-  const [filter, setFilter] = useState("ON_GOING");
+  const [filter, setFilter] = useState("ALL");
+  const [priceInputs, setPriceInputs] = useState({}); // store temporary price inputs
 
   const fetchOrders = async () => {
     try {
       const res = await api.get("/orders/");
       setOrders(res.data);
+
+      // initialize price inputs with current total_price
+      const initialPrices = {};
+      res.data.forEach((order) => {
+        initialPrices[order.id] = order.total_price || "";
+      });
+      setPriceInputs(initialPrices);
     } catch (err) {
       console.error(err);
     }
@@ -18,29 +26,58 @@ function StaffOrdersPage() {
     fetchOrders();
   }, []);
 
+  // Generic update function using FormData
   const handleUpdate = async (id, data) => {
     try {
-      await api.patch(`/orders/${id}/`, data);
-      fetchOrders();
+      const formData = new FormData();
+      Object.keys(data).forEach((key) => {
+        formData.append(key, data[key]);
+      });
+
+      const res = await api.patch(`/orders/${id}/`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      // Update the specific order in state without resetting
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === id ? { ...order, ...res.data } : order
+        )
+      );
+
+      // Update local price input if total_price changed
+      if (res.data.total_price !== undefined) {
+        setPriceInputs((prev) => ({ ...prev, [id]: res.data.total_price }));
+      }
     } catch (err) {
       console.error(err);
     }
   };
 
-  const visibleOrders = orders.filter(
-    (o) => (filter === "ALL" ? true : o.status === filter)
+  const handlePriceChange = (id, value) => {
+    setPriceInputs({ ...priceInputs, [id]: value });
+  };
+
+  const handleSetPrice = (id) => {
+    const value = Number(priceInputs[id]);
+    if (isNaN(value)) return;
+    handleUpdate(id, { total_price: value });
+  };
+
+  const visibleOrders = orders.filter((o) =>
+    filter === "ALL" ? true : o.status === filter
   );
 
   const statusOptions = [
     { value: "ALL", label: "सबै" },
-    { value: "ON_GOING", label: "चालु" },
+    { value: "PENDING", label: "चालु" },
     { value: "COMPLETED", label: "पूरा भयो" },
     { value: "CANCELLED", label: "रद्द भयो" },
     { value: "REJECTED", label: "अस्वीकृत" },
   ];
 
   return (
-    <div className="p-6">
+    <div className="p-6 text-black">
       <h1 className="text-2xl font-bold mb-4">अर्डर व्यवस्थापन</h1>
 
       <select
@@ -62,29 +99,43 @@ function StaffOrdersPage() {
       {visibleOrders.map((order) => (
         <div key={order.id} className="bg-white p-4 mb-3 rounded shadow">
           <p>
-            <strong>अर्डर #{order.id}</strong> — {order.customer_name}
+            <strong>अर्डर #{order.id}</strong> —{" "}
+            {order.customer?.username || order.customer?.email || "ग्राहक"}
           </p>
-          <p>स्थिति: {order.status_display || order.status}</p>
-          <p>
-            मूल्य:{" "}
-            {Number(order.total_price) > 0 ? `Nrs.${order.total_price}` : "—"}
-          </p>
+          <p>स्थिति: {order.status}</p>
 
-          {/* Order items with multiple images */}
+          {/* Price input + button */}
+          <div className="mt-1 flex items-center space-x-2">
+            <input
+              type="number"
+              value={priceInputs[order.id] ?? ""}
+              onChange={(e) => handlePriceChange(order.id, e.target.value)}
+              className="border px-2 py-1 rounded w-32"
+              placeholder="रु सेट गर्नुहोस्"
+            />
+            <button
+              onClick={() => handleSetPrice(order.id)}
+              className="px-3 py-1 bg-blue-600 text-white rounded"
+            >
+              मूल्य सेट गर्नुहोस्
+            </button>
+          </div>
+
+          {/* Order items */}
           {order.items && order.items.length > 0 && (
             <div className="mt-2 space-y-2">
               {order.items.map((item) => (
                 <div key={item.id} className="border p-2 rounded">
                   <p className="font-semibold">
-                    {item.order_name_display || item.order_name} — मात्रा: {item.quantity}
+                    {item.order_name} — मात्रा: {item.quantity}
                   </p>
                   <p>{item.order_details}</p>
                   {item.images && item.images.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-1">
-                      {item.images.map((img, idx) => (
+                      {item.images.map((img) => (
                         <img
-                          key={idx}
-                          src={img}
+                          key={img.id}
+                          src={img.image}
                           alt={item.order_name}
                           className="w-20 h-20 object-cover rounded border"
                         />
@@ -96,7 +147,8 @@ function StaffOrdersPage() {
             </div>
           )}
 
-          {order.status === "ON_GOING" && (
+          {/* Status buttons */}
+          {order.status === "PENDING" && (
             <div className="mt-2 space-x-2">
               <button
                 onClick={() => handleUpdate(order.id, { status: "REJECTED" })}
@@ -110,14 +162,6 @@ function StaffOrdersPage() {
               >
                 पूरा भयो
               </button>
-              <input
-                type="number"
-                placeholder="मूल्य सेट गर्नुहोस्"
-                onBlur={(e) =>
-                  handleUpdate(order.id, { total_price: e.target.value })
-                }
-                className="border px-2 py-1 rounded"
-              />
             </div>
           )}
         </div>

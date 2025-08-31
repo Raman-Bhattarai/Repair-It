@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import api from "../api/api";
+import { getOrders } from "../api/api";
 import OrderDetails from "../components/orders/OrderDetails";
 import CreateOrder from "../components/orders/CreateOrder";
 import UpdateOrder from "../components/orders/UpdateOrder";
@@ -9,13 +9,17 @@ function OrdersPage() {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showUpdate, setShowUpdate] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchOrders = async () => {
     try {
-      const res = await api.get("orders/");
+      setLoading(true);
+      const res = await getOrders();
       setOrders(res.data);
     } catch (err) {
       console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -53,7 +57,9 @@ function OrdersPage() {
         <OrderDetails order={selectedOrder} onClose={() => setSelectedOrder(null)} />
       )}
 
-      {orders.length === 0 ? (
+      {loading ? (
+        <p>लोड हुँदै...</p>
+      ) : orders.length === 0 ? (
         <p>अहिलेसम्म कुनै अर्डर छैन। नयाँ अर्डर बनाउन सुरु गर्नुहोस्।</p>
       ) : (
         <ul className="space-y-2">
@@ -64,7 +70,7 @@ function OrdersPage() {
             >
               <span onClick={() => setSelectedOrder(order)}>
                 अर्डर #{order.id} | स्थिति: {order.status} | जम्मा: Rs.{" "}
-                {order.total_price}
+                {order.total_price ?? 0}
               </span>
               <button
                 onClick={() => setShowUpdate(order)}

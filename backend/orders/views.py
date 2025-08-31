@@ -2,20 +2,20 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.decorators import action
-from .models import Order
+from .models import Order, OrderItem, OrderItemImage
 from .serializers import OrderSerializer
-
+import json
 
 class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.all().order_by("-created_at")
+    queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        if not user.is_staff:
-            return self.queryset.filter(customer=user)
-        return self.queryset
+        if user.is_staff:
+            return Order.objects.all()
+        return Order.objects.filter(customer=user)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
@@ -23,19 +23,44 @@ class OrderViewSet(viewsets.ModelViewSet):
         return context
 
     def perform_create(self, serializer):
-        serializer.save(customer=self.request.user)
+        # DO NOT pass customer here; serializer already handles it
+        serializer.save()
+
 
     def perform_update(self, serializer):
-        instance = serializer.save()
-        instance.update_total_price()
+        order = serializer.save()
 
-    def perform_destroy(self, instance):
+        request = self.request
+        items_data = request.data.get("items_payload")
+        if isinstance(items_data, str):
+            try:
+                items_data = json.loads(items_data)
+            except json.JSONDecodeError:
+                items_data = []
+
+        if items_data:
+            # Clear existing items if you want to replace them entirely
+            order.items.all().delete()
+
+            for idx, item_data in enumerate(items_data):
+                order_item = OrderItem.objects.create(order=order, **item_data)
+
+                # Handle uploaded files for this item
+                files = request.FILES.getlist(f"item_images_{idx}")
+                for f in files:
+                    OrderItemImage.objects.create(item=order_item, image=f)
+
+        # Recalculate total price
+        order.update_total_price()
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
         if instance.status in [Order.Status.COMPLETED, Order.Status.REJECTED]:
             return Response(
                 {"detail": "पूरा वा अस्वीकृत अर्डर मेटाउन मिल्दैन।"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        instance.delete()
+        return super().destroy(request, *args, **kwargs)
 
     @action(detail=True, methods=["post"], permission_classes=[IsAuthenticated])
     def cancel(self, request, pk=None):
@@ -45,22 +70,26 @@ class OrderViewSet(viewsets.ModelViewSet):
         if not user.is_staff and order.customer != user:
             return Response({"detail": "अस्वीकृत"}, status=status.HTTP_403_FORBIDDEN)
 
-        if order.status not in [Order.Status.COMPLETED, Order.Status.REJECTED]:
-            order.status = Order.Status.REJECTED
-            order.save()
+        if order.status in [Order.Status.COMPLETED, Order.Status.REJECTED]:
+            return Response({"detail": "यो अर्डर रद्द गर्न मिल्दैन।"}, status=400)
 
-        return Response(self.get_serializer(order).data)
+        if order.status == Order.Status.CANCELLED:
+            return Response({"detail": "अर्डर पहिले नै रद्द गरिएको छ।"}, status=400)
+
+        order.status = Order.Status.CANCELLED
+        order.save()
+
+        serializer = self.get_serializer(order)
+        return Response(serializer.data)
 
     @action(detail=False, methods=["get"], permission_classes=[IsAdminUser])
     def reports(self, request):
-        total_orders = self.queryset.count()
-        completed = self.queryset.filter(status=Order.Status.COMPLETED).count()
-        rejected = self.queryset.filter(status=Order.Status.REJECTED).count()
-        pending = self.queryset.filter(status=Order.Status.PENDING).count()
-        total_revenue = sum(
-            order.total_price or 0
-            for order in self.queryset.filter(status=Order.Status.COMPLETED)
-        )
+        qs = Order.objects.all()  # admins see all orders
+        total_orders = qs.count()
+        completed = qs.filter(status=Order.Status.COMPLETED).count()
+        rejected = qs.filter(status=Order.Status.REJECTED).count()
+        pending = qs.filter(status=Order.Status.PENDING).count()
+        total_revenue = sum((o.total_price or 0) for o in qs.filter(status=Order.Status.COMPLETED))
 
         return Response({
             "कुल अर्डर": total_orders,

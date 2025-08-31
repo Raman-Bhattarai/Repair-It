@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import api from "../../api/api";
+import { placeOrder } from "../../api/api";
 
 function CreateOrder({ onClose, onOrderCreated }) {
   const [items, setItems] = useState([
     { order_name: "", order_details: "", quantity: 1, images: [] },
   ]);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
   const handleItemChange = (idx, field, value) => {
     const updated = [...items];
@@ -24,45 +26,52 @@ function CreateOrder({ onClose, onOrderCreated }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
+    setError("");
+
     try {
       const formData = new FormData();
       formData.append("status", "PENDING");
 
-      // Convert items (without images) to JSON string
-      const itemsData = items.map((item, idx) => ({
-        order_name: item.order_name,
-        order_details: item.order_details,
-        quantity: item.quantity,
-        images: [], // DRF expects JSON field; images handled separately
-      }));
-      formData.append("items", JSON.stringify(itemsData));
-
-      // Append files separately
+      // Convert items (without files) to JSON string
+      const itemsData = items.map(() => ({})); // indexes matter, payload below fills values
       items.forEach((item, idx) => {
-        Array.from(item.images).forEach((file) => {
+        itemsData[idx] = {
+          order_name: item.order_name,
+          order_details: item.order_details,
+          quantity: Number(item.quantity || 1),
+          price: 0,
+        };
+      });
+      formData.append("items_payload", JSON.stringify(itemsData));
+
+      // Append files separately per item index
+      items.forEach((item, idx) => {
+        Array.from(item.images || []).forEach((file) => {
           formData.append(`item_images_${idx}`, file);
         });
       });
 
-      const res = await api.post("/orders/", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      console.log("Order created:", res.data);
+      await placeOrder(formData);
       onOrderCreated();
       onClose();
     } catch (err) {
-      console.error("Order creation failed:", err.response?.data || err.message);
+      const data = err.response?.data;
+      console.error("Order creation failed:", data || err.message);
+      setError(typeof data === "object" ? JSON.stringify(data) : String(data || err.message));
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
     <div className="border p-4 rounded bg-gray-50 text-black">
       <h3 className="font-bold mb-2">नयाँ अर्डर</h3>
+      {error && <div className="text-red-600 mb-2 text-sm break-words">{error}</div>}
       <form onSubmit={handleSubmit}>
         {items.map((item, idx) => (
           <div key={idx} className="mb-3 border p-2 rounded">
-            <label>उपकरण प्रकार</label>
+            <label className="block text-sm">उपकरण प्रकार</label>
             <select
               className="border p-1 w-full"
               value={item.order_name}
@@ -104,8 +113,8 @@ function CreateOrder({ onClose, onOrderCreated }) {
         <button type="button" className="bg-gray-500 text-white px-2 py-1 rounded mr-2" onClick={addItem}>
           + थप्नुहोस्
         </button>
-        <button type="submit" className="bg-green-500 text-white px-4 py-1 rounded">
-          अर्डर पठाउनुहोस्
+        <button type="submit" disabled={submitting} className="bg-green-500 text-white px-4 py-1 rounded">
+          {submitting ? "पठाउँदै..." : "अर्डर पठाउनुहोस्"}
         </button>
         <button type="button" className="ml-2 text-red-600" onClick={onClose}>
           रद्द गर्नुहोस्

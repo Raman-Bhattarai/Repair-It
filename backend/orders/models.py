@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+from decimal import Decimal
+
 
 class Order(models.Model):
     class Status(models.TextChoices):
@@ -14,14 +16,13 @@ class Order(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    def save(self, *args, **kwargs):
-        if self.status in [self.Status.COMPLETED, self.Status.REJECTED]:
-            raise ValueError("पूरा भएको वा अस्वीकृत अर्डर परिवर्तन गर्न मिल्दैन।")
-        super().save(*args, **kwargs)
-
+    # Do NOT block save here; enforce immutability in the view/serializer
     def update_total_price(self):
-        self.total_price = sum(item.total_price for item in self.items.all())
-        self.save()
+        total = Decimal("0.00")
+        for item in self.items.all():
+            total += item.total_price
+        self.total_price = total
+        super().save(update_fields=["total_price", "updated_at"])
 
     def __str__(self):
         return f"Order {self.id} by {self.customer}"
@@ -38,21 +39,21 @@ class OrderItem(models.Model):
 
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     order_name = models.CharField(max_length=50, choices=Appliance.choices)
-    order_details = models.TextField()
-    quantity = models.PositiveIntegerField()
+    order_details = models.TextField(blank=True)
+    quantity = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
     @property
     def total_price(self):
-        return self.quantity * self.price
+        return self.price * self.quantity
 
     def __str__(self):
-        return f"{self.appliance} - {self.order.id}"
-    
+        return f"{self.order_name} - {self.order.id}"
+
     def delete(self, *args, **kwargs):
         order = self.order
         super().delete(*args, **kwargs)
-        order.calculate_total()
+        order.update_total_price()
 
 
 class OrderItemImage(models.Model):
@@ -61,4 +62,3 @@ class OrderItemImage(models.Model):
 
     def __str__(self):
         return f"Image for {self.item}"
-
