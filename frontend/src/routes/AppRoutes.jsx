@@ -1,9 +1,9 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 import ProtectedRoute from "../components/ProtectedRoute";
 
-// Pages
+
 import Home from "../pages/Home";
 import Dashboard from "../pages/Dashboard";
 import Login from "../pages/Login";
@@ -19,7 +19,31 @@ import ResetPasswordPage from "../pages/ResetPasswordPage";
 function AppRoutes() {
   return (
     <Router>
-        <Navbar />
+      <LayoutWithConditionalNavbar />
+    </Router>
+  );
+}
+
+
+function LayoutWithConditionalNavbar() {
+  const location = useLocation();
+
+
+  const hideNavbarRoutes = [
+    "/login",
+    "/register",
+    "/forgot-password"
+  ];
+
+  const isResetPasswordRoute = location.pathname.startsWith("/reset-password");
+
+  const shouldHideNavbar =
+    hideNavbarRoutes.includes(location.pathname) || isResetPasswordRoute;
+
+  return (
+    <>
+      {!shouldHideNavbar && <Navbar />}
+
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -78,9 +102,12 @@ function AppRoutes() {
         />
 
         {/* Fallback */}
-        <Route path="*" element={<p className="text-center mt-20">Page Not Found</p>} />
+        <Route
+          path="*"
+          element={<p className="text-center mt-20">Page Not Found</p>}
+        />
       </Routes>
-    </Router>
+    </>
   );
 }
 

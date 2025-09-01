@@ -29,7 +29,7 @@ function ForgotPasswordPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-rose-100 to-rose-200 p-4">
+    <div className="flex items-center justify-center min-h-screen pt-20 bg-gradient-to-br from-rose-100 to-rose-200 p-4">
       <div className="bg-white shadow-2xl rounded-3xl p-10 w-full max-w-md border-t-8 border-rose-400">
         <h2 className="text-3xl font-extrabold text-center text-rose-600 mb-6 drop-shadow-md">
           पासवर्ड रिसेट गर्नुहोस्
@@ -38,7 +38,7 @@ function ForgotPasswordPage() {
         {message ? (
           <div className="text-center space-y-4">
             <p className="text-green-500 font-medium">{message}</p>
-            <Button onClick={() => navigate("/login")} variant="primary" className="mt-2">
+            <Button onClick={() => navigate("/login")} variant="primary" className="mt-2 w-full">
               लगइन पृष्ठमा जानुहोस्
             </Button>
           </div>
@@ -59,10 +59,17 @@ function ForgotPasswordPage() {
             </Button>
           </form>
         )}
+
+        {/* Home button */}
+        <button
+          onClick={() => navigate("/")}
+          className="mt-6 w-full px-4 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 text-white font-medium shadow hover:from-rose-600 hover:to-pink-700 transition"
+        >
+          🏠 Homepage फर्किनुहोस्
+        </button>
       </div>
     </div>
   );
 }
 
 export default ForgotPasswordPage;
-

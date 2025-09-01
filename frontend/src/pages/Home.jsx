@@ -4,11 +4,11 @@ import VideoPlayer from "../components/player/VideoPlayer";
 
 function HomePage() {
   return (
-    <div className="min-h-screen bg-gray-50 pt-50">
+    <div className="min-h-screen bg-gray-50 pt-20">
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-cyan-400 to-cyan-600 text-white py-16 shadow-lg">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl md:text-5xl font-extrabold mb-4 drop-shadow-lg">
+      <div className="bg-gradient-to-r from-cyan-500 to-cyan-700 text-white py-20 shadow-lg">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h1 className="text-5xl font-extrabold mb-4 drop-shadow-lg">
             रिपेयर इट
           </h1>
           <p className="text-lg md:text-xl font-medium opacity-90">
@@ -47,16 +47,10 @@ function HomePage() {
         {/* Fridge Repair */}
         <div className="grid md:grid-cols-2 gap-10 items-center">
           <VideoPlayer
-            sources={[
-              "/videos/fridge/1.mp4",
-              "/videos/fridge/2.mp4",
-              "/videos/fridge/3.mp4",
-            ]}
+            sources={["/videos/fridge/1.mp4", "/videos/fridge/2.mp4", "/videos/fridge/3.mp4"]}
           />
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              फ्रिज मर्मत सेवा
-            </h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">फ्रिज मर्मत सेवा</h3>
             <p className="text-gray-700 leading-relaxed">
               हामी विशेषज्ञ फ्रिज मर्मत सेवा प्रदान गर्छौं जसले तपाईंको खानेकुरा
               लामो समय ताजा रहोस्। चिसो नहुने, चुहावट वा अनौठो आवाज जस्ता
@@ -68,33 +62,23 @@ function HomePage() {
         {/* Washing Machine Repair */}
         <div className="grid md:grid-cols-2 gap-10 items-center">
           <div className="order-2 md:order-1">
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              वाशिङ मेसिन मर्मत
-            </h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">वाशिङ मेसिन मर्मत</h3>
             <p className="text-gray-700 leading-relaxed">
-              निकास समस्या, अनौठो कम्पन वा अन्य समस्या भए पनि हाम्रो वाशिङ
-              मेसिन मर्मत सेवा सबै प्रमुख समस्याहरू समाधान गर्छ। हामी तपाईंको
-              कपडा धुने कार्यलाई फेरि सहज बनाउनेछौं।
+              निकास समस्या, अनौठो कम्पन वा अन्य समस्या भए पनि हाम्रो वाशिङ मेसिन
+              मर्मत सेवा सबै प्रमुख समस्याहरू समाधान गर्छ। हामी तपाईंको कपडा धुने
+              कार्यलाई फेरि सहज बनाउनेछौं।
             </p>
           </div>
           <VideoPlayer
-            sources={[
-              "/videos/washing/1.mp4",
-              "/videos/washing/2.mp4",
-              "/videos/washing/3.mp4",
-            ]}
+            sources={["/videos/washing/1.mp4", "/videos/washing/2.mp4", "/videos/washing/3.mp4"]}
           />
         </div>
 
         {/* AC Repair */}
         <div className="grid md:grid-cols-2 gap-10 items-center">
-          <VideoPlayer
-            sources={["/videos/AC/1.mp4", "/videos/AC/2.mp4"]}
-          />
+          <VideoPlayer sources={["/videos/AC/1.mp4", "/videos/AC/2.mp4"]} />
           <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">
-              एयर कन्डिसनर मर्मत
-            </h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-3">एयर कन्डिसनर मर्मत</h3>
             <p className="text-gray-700 leading-relaxed">
               हाम्रो भरपर्दो एसी मर्मत सेवाबाट तपाईं शान्त र आरामदायी रहन सक्नुहुन्छ।
               ग्यास चुहावटदेखि चिसोपन समस्या सम्म सबै कुरा हामी ह्यान्डल गर्छौं,
@@ -105,11 +89,10 @@ function HomePage() {
       </div>
 
       {/* Call-to-Action Section */}
-      <div className="bg-gradient-to-r from-rose-500 to-red-500 py-20 text-center text-white">
+      <div className="bg-gradient-to-r from-rose-500 to-red-600 py-20 text-center text-white">
         <h2 className="text-3xl font-extrabold mb-4">मर्मत आवश्यक छ?</h2>
         <p className="text-lg md:text-xl mb-6 max-w-2xl mx-auto opacity-90">
-          हाम्रो सजिलो अर्डर प्रणाली मार्फत तपाईं हाम्रो मर्मत सेवाको अर्डर राख्न
-          सक्नुहुन्छ। सुरु गर्न तल क्लिक गर्नुहोस्!
+          हाम्रो सजिलो अर्डर प्रणाली मार्फत तपाईं हाम्रो मर्मत सेवाको अर्डर राख्न सक्नुहुन्छ।
         </p>
         <Link
           to="/order"
@@ -130,4 +113,3 @@ function HomePage() {
 }
 
 export default HomePage;
-

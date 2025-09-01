@@ -33,7 +33,7 @@ function ReportPage() {
     return <p className="text-center mt-20 text-gray-700 animate-pulse">Loading report...</p>;
 
   return (
-    <div className="p-6 pt-16">
+    <div className="p-6 pt-20 min-h-screen bg-gray-50">
       <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">
         Reports
       </h1>
@@ -41,7 +41,7 @@ function ReportPage() {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
         <div className="bg-white p-6 rounded-xl shadow-lg border text-center">
-          <h2 className="text-lg font-semibold text-gray-600">Total Orders</h2>
+          <h2 className="text-lg font-semibold text-gray-600">Completed Orders</h2>
           <p className="text-3xl font-bold mt-3 text-gray-900">{totalOrders}</p>
         </div>
         <div className="bg-white p-6 rounded-xl shadow-lg border text-center">

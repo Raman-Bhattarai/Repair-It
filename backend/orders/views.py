@@ -26,27 +26,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer.save() # DO NOT pass customer here; serializer already handles it
 
     def perform_update(self, serializer):
-        request = self.request
-        order = serializer.save()
-
-        # only allow customers to update items, not total_price
-        if not request.user.is_staff:
-            items_data = request.data.get("items_payload")
-            if isinstance(items_data, str):
-                try:
-                    items_data = json.loads(items_data)
-                except json.JSONDecodeError:
-                    items_data = []
-
-            if items_data:
-                order.items.all().delete()
-                for idx, item_data in enumerate(items_data):
-                    order_item = OrderItem.objects.create(order=order, **item_data)
-                    files = request.FILES.getlist(f"item_images_{idx}")
-                    for f in files:
-                        OrderItemImage.objects.create(item=order_item, image=f)
-
-            order.update_total_price()
+        serializer.save()  # update logic is handled in serializer
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()

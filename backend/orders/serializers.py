@@ -2,11 +2,21 @@ from rest_framework import serializers
 from .models import Order, OrderItem, OrderItemImage
 import json
 
-
+        
 class OrderItemImageSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(read_only=True)  # use_url=True by default
+
     class Meta:
         model = OrderItemImage
         fields = ["id", "image"]
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        request = self.context.get("request")
+        if request and instance.image:
+            rep["image"] = request.build_absolute_uri(instance.image.url)
+        return rep
+
 
 
 class OrderItemSerializer(serializers.ModelSerializer):
@@ -38,6 +48,11 @@ class OrderSerializer(serializers.ModelSerializer):
 
         # Create order items
         for idx, item_data in enumerate(items_data):
+            # Remove frontend-only keys
+            item_data.pop("remove_image_ids", None)
+            item_id = item_data.pop("id", None)
+
+            # Create the OrderItem
             order_item = OrderItem.objects.create(order=order, **item_data)
 
             # Save uploaded images for this item
@@ -49,19 +64,54 @@ class OrderSerializer(serializers.ModelSerializer):
         order.update_total_price()
 
         return order
-
+    
     def update(self, instance, validated_data):
         request = self.context.get("request")
 
-        # prevent changing customer
+        # Prevent changing customer
         validated_data.pop("customer", None)
 
-        if not request.user.is_staff:
-            # Customers should not be able to change total_price or status directly
-            validated_data.pop("total_price", None)
+        if request.user.is_staff:
+            # Staff can update status and price
+            # All other fields are editable by staff
+            items_data = validated_data.pop("items_payload", None)
+            instance = super().update(instance, validated_data)
+            if items_data:
+                self._update_items(instance, items_data, request.FILES)
+        else:
+            # Customer can only update items (name, details, quantity, images)
             validated_data.pop("status", None)
+            validated_data.pop("total_price", None)
+            instance = super().update(instance, validated_data)
+            items_data = self.context["request"].data.get("items_payload")
+            if items_data:
+                if isinstance(items_data, str):
+                    try:
+                        items_data = json.loads(items_data)
+                    except json.JSONDecodeError:
+                        items_data = []
+                self._update_items(instance, items_data, request.FILES)
 
-        return super().update(instance, validated_data)
+        # Update total price
+        instance.update_total_price()
+        return instance
+                
+    def _update_items(self, order, items_data, files_dict):
+        """Minimal fix: remove frontend-only fields so Django doesn't crash.
+        Keeps your existing logic (customer deletes all items, staff can update status/price)."""
+        order.items.all().delete()  # Keep your current delete logic
+        for idx, item_data in enumerate(items_data):
+            # Remove frontend-only keys
+            item_data.pop("remove_image_ids", None)
+            item_id = item_data.pop("id", None)  # optional, in case frontend sends id
+
+            # Create the OrderItem safely
+            order_item = OrderItem.objects.create(order=order, **item_data)
+
+            # Add uploaded images
+            for f in files_dict.getlist(f"item_images_{idx}"):
+                OrderItemImage.objects.create(item=order_item, image=f)
+
 
     def _coerce_items(self, items_data):
         if not items_data:

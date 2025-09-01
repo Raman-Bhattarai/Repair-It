@@ -68,7 +68,7 @@ function RegisterPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-rose-100 to-rose-200 p-4">
+    <div className="flex items-center justify-center min-h-screen pt-10 bg-gradient-to-br from-rose-100 to-rose-200 p-4">
       <div className="bg-white shadow-2xl rounded-3xl p-10 w-full max-w-md border-t-8 border-rose-400">
         <h2 className="text-3xl font-extrabold text-center text-rose-600 mb-6 drop-shadow-md">
           Register
@@ -90,11 +90,22 @@ function RegisterPage() {
         </form>
 
         <p className="text-center text-sm text-gray-600 mt-4">
-          Already have an account?{" "}
-          <span onClick={() => navigate("/login")} className="text-rose-600 cursor-pointer hover:underline font-medium">
-            Login
+          पहिल्यै खाता छ?{" "}
+          <span
+            onClick={() => navigate("/login")}
+            className="text-rose-600 cursor-pointer hover:underline font-medium"
+          >
+            लग-इन गर्नुहोस्
           </span>
         </p>
+
+        {/* ✅ Home button */}
+        <button
+          onClick={() => navigate("/")}
+          className="mt-4 w-full px-4 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-pink-600 text-white font-medium shadow hover:from-rose-600 hover:to-pink-700 transition"
+        >
+          🏠 Homeage फर्किनुहोस्
+        </button>
       </div>
     </div>
   );

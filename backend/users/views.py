@@ -130,7 +130,7 @@ class ForgotPasswordView(APIView):
         uid = urlsafe_base64_encode(force_bytes(user.pk))
 
         # Create frontend reset URL (frontend should handle JWT verification)
-        reset_url = f"http://localhost:3000/reset-password/{uid}/{access_token}/"
+        reset_url = f"http://localhost:5173/reset-password/{uid}/{access_token}/"
 
         # Send email
         send_mail(

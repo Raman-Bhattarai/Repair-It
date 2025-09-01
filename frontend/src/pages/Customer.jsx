@@ -8,7 +8,7 @@ function CustomerPage() {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await api.get("users/customers/"); // create endpoint in Django
+        const response = await api.get("users/customers/");
         setCustomers(response.data);
       } catch (err) {
         console.error(err);
@@ -23,10 +23,8 @@ function CustomerPage() {
   if (customers.length === 0) return <p className="text-center mt-20 text-gray-600">No customers found.</p>;
 
   return (
-    <div className="p-6 pt-16">
-      <h1 className="text-3xl font-extrabold text-gray-900 mb-6 text-center">
-        Customers
-      </h1>
+    <div className="p-6 pt-20">
+      <h1 className="text-3xl font-extrabold text-gray-900 mb-6 text-center">Customers</h1>
 
       <div className="overflow-x-auto">
         <div className="bg-gradient-to-r from-sky-200 to-sky-400 rounded-2xl shadow-xl overflow-hidden">
@@ -60,4 +58,3 @@ function CustomerPage() {
 }
 
 export default CustomerPage;
-

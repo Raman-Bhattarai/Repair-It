@@ -23,7 +23,7 @@ function StaffPage() {
   if (staff.length === 0) return <p className="text-center mt-20 text-gray-600">No staff found.</p>;
 
   return (
-    <div className="p-6 pt-16">
+    <div className="p-6 pt-20 min-h-screen bg-gray-50">
       <h1 className="text-3xl font-extrabold text-gray-900 mb-6 text-center">
         Staff Members
       </h1>
